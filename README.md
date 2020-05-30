@@ -4,6 +4,14 @@ Built using Flex & Bison to take in any java source code and emits its equivalen
 
 <p align='center'><img src='./images/cover.png'/></p>
 
+## Running & Testing 
+To run the program, use the script `run.sh` as follows:
+
+    ./run.sh file_name
+    
+where filename, can be any file that contains java source code, for testing purposes let's keep all our test files from the `test-cases` folder and picking the suitable unit test case for the part you're developing. 
+
+
 ## Resources 
 
 ### Understanding Flex & Bison
