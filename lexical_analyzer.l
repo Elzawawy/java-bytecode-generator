@@ -23,9 +23,9 @@ arithop   "+" |"-" |"*" |"/" | "%"
 {fnum} { return FLOAT_NUM;}
 {arithop}  { return ARITH_OP;}
 {relop} { return REL_OP;}
-"if"    { return IF_KEYWORD;}
-"else"  { return ELSE_KEYWORD;}
-"while" { return WHILE_KEYWORD;}
+"if"    { return IF;}
+"else"  { return ELSE;}
+"while" { return WHILE;}
 "int"	{ return INT;}
 "float"	{ return FLOAT;}
 "=" { return EQUAL;}

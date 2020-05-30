@@ -1,15 +1,21 @@
 %{
-
+  #include <cstdio>
+  #include <iostream>
+  extern int yylex();
+  extern int yyparse();
+  extern FILE *yyin;
+  void yyerror(const char *s);
 %}
+%start METHOD_BODY
 
 %token IDENTIFIER
 %token INT_NUM
 %token FLOAT_NUM
 %token ARITH_OP
 %token REL_OP
-%token IF_KEYWORD
-%token ELSE_KEYWORD
-%token WHILE_KEYWORD
+%token IF
+%token ELSE
+%token WHILE
 %token INT
 %token FLOAT
 %token EQUAL
@@ -20,50 +26,73 @@
 %token LEFT_BRACE
 %token RIGHT_BRACE
 
+
 %%
-METHOD_BODY: 
-            STATEMENT_LIST
+method_body: 
+            statement_list
             ;
 
-STATEMENT_LIST: 
-                STATEMENT
-                |STATEMENT_LIST STATEMENT
+statement_list: 
+                statment
+                |statement_list statment
                 ;
 
-STATMENT:  
-        DECLARATION 
-        |IF 
-        |WHILE 
-        |ASSIGNMENT
+statement:  
+        declaration 
+        |if 
+        |while 
+        |assignment
         ;
 
-DECLARATION: PRIMITIVE_TYPE IDENTIFIER SEMICOLON;
+declaration: primitive_type IDENTIFIER SEMICOLON;
 
-PRIMITIVE_TYPE: 
+primitive_type: 
                 INT 
                 |FLOAT
                 ;
 
-IF: 
-    IF_KEYWORD LEFT_BRACKET 
-    EXPRESSION RIGHT_BRACKET
-    LEFT_BRACE STATEMENT_LIST 
-    RIGHT_BRACE ELSE_KEYWORD 
-    LEFT_BRACE STATEMENT_LIST RIGHT_BRACE
+if: 
+    IF LEFT_BRACKET 
+    expression RIGHT_BRACKET
+    LEFT_BRACE statement_list 
+    RIGHT_BRACE ELSE LEFT_BRACE 
+    statement_list RIGHT_BRACE
     ;
 
-WHILE: 
-        WHILE_KEYWORD LEFT_BRACKET
-        EXPRESSION RIGHT_BRACKET
-        LEFT_BRACE STATEMENT_LIST RIGHT_BRACE
+while: 
+        WHILE LEFT_BRACKET
+        expression RIGHT_BRACKET
+        LEFT_BRACE statement_list RIGHT_BRACE
         ;
 
-ASSIGNMENT: IDENTIFIER EQUAL EXPRESSION SEMICOLON;
+assignment: IDENTIFIER EQUAL expression SEMICOLON;
 
-EXPRESSION:
+expression:
             INT_NUM
             |FLOAT_NUM
-            |EXPRESSION ARITH_OP EXPRESSION
+            |expression ARITH_OP expression
             |IDENTIFIER
-            |LEFT_BRACKET EXPRESSION RIGHT_BRACKET
+            |LEFT_BRACKET expression RIGHT_BRACKET
             ;
+%%
+
+int main(int, char**) {
+  // Open a file handle to a particular file:
+  FILE *myfile = fopen("java_source_code.in", "r");
+  // Make sure it is valid:
+  if (!myfile) {
+    cout << "I can't open file!" << endl;
+    return -1;
+  }
+  // Set Flex to read from it instead of defaulting to STDIN:
+  yyin = myfile;
+  
+  // Parse through the input:
+  yyparse();
+  
+}
+
+void yyerror(const char *s) {
+  std::cout << "EEK, parse error!  Message: " << s << std::endl;
+  std::exit(-1);
+}
