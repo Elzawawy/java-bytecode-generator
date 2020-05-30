@@ -89,9 +89,9 @@ boolean_expression:
 
 %%
 
-int main(int, char**) {
+int main(int argc, char** argv) {
   // Open a file handle to a particular file:
-  FILE *myfile = fopen("java_source_code.in", "r");
+  FILE *myfile = fopen(argv[1], "r");
   // Make sure it is valid:
   if (!myfile) {
     std::cout << "I can't open file!" << std::endl;
