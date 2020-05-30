@@ -18,17 +18,17 @@ arithop   "+" |"-" |"*" |"/" | "%"
 /** TOKENS Matching Specififcation, with their Semantic Actions. **/
 %%
 {whitespace} ;
-{id}    { return ID;}
+{id}    { return IDENTIFIER;}
 {inum}   { return INT_NUM;}
 {fnum} { return FLOAT_NUM;}
 {arithop}  { return ARITH_OP;}
 {relop} { return REL_OP;}
-"if"    { return IF;}
-"else"  { return ELSE;}
-"while" { return WHILE;}
+"if"    { return IF_KEYWORD;}
+"else"  { return ELSE_KEYWORD;}
+"while" { return WHILE_KEYWORD;}
 "int"	{ return INT;}
 "float"	{ return FLOAT;}
-"=" { return ASSIGN;}
+"=" { return EQUAL;}
 "," { return COMMA;}
 ";" { return SEMICOLON;}
 "(" { return LEFT_BRACKET;}

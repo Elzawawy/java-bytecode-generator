@@ -1,0 +1,69 @@
+%{
+
+%}
+
+%token IDENTIFIER
+%token INT_NUM
+%token FLOAT_NUM
+%token ARITH_OP
+%token REL_OP
+%token IF_KEYWORD
+%token ELSE_KEYWORD
+%token WHILE_KEYWORD
+%token INT
+%token FLOAT
+%token EQUAL
+%token COMMA
+%token SEMICOLON
+%token LEFT_BRACKET
+%token RIGHT_BRACKET
+%token LEFT_BRACE
+%token RIGHT_BRACE
+
+%%
+METHOD_BODY: 
+            STATEMENT_LIST
+            ;
+
+STATEMENT_LIST: 
+                STATEMENT
+                |STATEMENT_LIST STATEMENT
+                ;
+
+STATMENT:  
+        DECLARATION 
+        |IF 
+        |WHILE 
+        |ASSIGNMENT
+        ;
+
+DECLARATION: PRIMITIVE_TYPE IDENTIFIER SEMICOLON;
+
+PRIMITIVE_TYPE: 
+                INT 
+                |FLOAT
+                ;
+
+IF: 
+    IF_KEYWORD LEFT_BRACKET 
+    EXPRESSION RIGHT_BRACKET
+    LEFT_BRACE STATEMENT_LIST 
+    RIGHT_BRACE ELSE_KEYWORD 
+    LEFT_BRACE STATEMENT_LIST RIGHT_BRACE
+    ;
+
+WHILE: 
+        WHILE_KEYWORD LEFT_BRACKET
+        EXPRESSION RIGHT_BRACKET
+        LEFT_BRACE STATEMENT_LIST RIGHT_BRACE
+        ;
+
+ASSIGNMENT: IDENTIFIER EQUAL EXPRESSION SEMICOLON;
+
+EXPRESSION:
+            INT_NUM
+            |FLOAT_NUM
+            |EXPRESSION ARITH_OP EXPRESSION
+            |IDENTIFIER
+            |LEFT_BRACKET EXPRESSION RIGHT_BRACKET
+            ;
