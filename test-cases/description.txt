@@ -1,0 +1,17 @@
+In this folder we maintain the test cases we try out for each situation. 
+Mainly, we have four type of statments we need to support (bonus work regarded later on)
+
+Unit Testing:
+=============
+Declartaion Statments: a_code.in
+Assignment Statments: b_code.in
+If Statments: c_code.in
+While Statements: d_code.in
+
+Integration Testing (All cases):
+================================
+Use e_code.in to perform multiple cases nested in each other. Each done statement type should be appended there.
+
+Feel free to append, or modify existing testscase files (I just wrote bunch of silly ones to start with :D).
+Add new tastscase files when they appear but remmember to add a description for them here.
+The testcases folder should optmistically do almost full test coverage over our program. 

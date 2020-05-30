@@ -1,5 +1,5 @@
 int x;
-int y ;
+int y;
 y = 5;
 int z ;
 z = 130;

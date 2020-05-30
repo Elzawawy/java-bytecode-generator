@@ -1,0 +1,17 @@
+int x;
+int y;
+y = 5;
+int z ;
+z = 130;
+int z1;
+z1 = 65536;
+int b;
+b = 300;
+int a;
+a = 11;
+int n ;
+n= 500;
+float zz;
+zz = 1.1;
+x = 6 + y;
+y = z % b;
