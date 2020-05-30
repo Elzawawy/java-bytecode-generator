@@ -6,7 +6,7 @@
   extern FILE *yyin;
   void yyerror(const char *s);
 %}
-%start METHOD_BODY
+%start method_body
 
 %token IDENTIFIER
 %token INT_NUM
@@ -33,8 +33,8 @@ method_body:
             ;
 
 statement_list: 
-                statment
-                |statement_list statment
+                statement
+                |statement_list statement
                 ;
 
 statement:  

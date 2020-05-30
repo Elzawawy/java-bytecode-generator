@@ -9,8 +9,8 @@ digits  {digit}+
 id  {letter}({letter}|{digit})*
 inum {digits}
 fnum   {digits}.{digit}("E"{digits}+)?
-relop   "=" |"!=" |"<=" |">=" |"<" |">"
-arithop   "+" |"-" |"*" |"/" | "%"
+arithop "+"|"-"|"*"|"/"|"%"
+relop   "=="|"!="|"<="|">="|"<"|">"
 
 /** Extra Options Section**/
 %option noyywrap
@@ -18,16 +18,16 @@ arithop   "+" |"-" |"*" |"/" | "%"
 /** TOKENS Matching Specififcation, with their Semantic Actions. **/
 %%
 {whitespace} ;
-{id}    { return IDENTIFIER;}
-{inum}   { return INT_NUM;}
-{fnum} { return FLOAT_NUM;}
-{arithop}  { return ARITH_OP;}
-{relop} { return REL_OP;}
 "if"    { return IF;}
 "else"  { return ELSE;}
 "while" { return WHILE;}
 "int"	{ return INT;}
 "float"	{ return FLOAT;}
+{id}    { return IDENTIFIER;}
+{inum}   { return INT_NUM;}
+{fnum} { return FLOAT_NUM;}
+{arithop}  { return ARITH_OP;}
+{relop} { return REL_OP;}
 "=" { return EQUAL;}
 "," { return COMMA;}
 ";" { return SEMICOLON;}
