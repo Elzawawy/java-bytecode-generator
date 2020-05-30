@@ -1,11 +1,13 @@
 %{
   #include <cstdio>
   #include <iostream>
+
   extern int yylex();
   extern int yyparse();
   extern FILE *yyin;
   void yyerror(const char *s);
 %}
+
 %start method_body
 
 %token IDENTIFIER
@@ -81,7 +83,7 @@ int main(int, char**) {
   FILE *myfile = fopen("java_source_code.in", "r");
   // Make sure it is valid:
   if (!myfile) {
-    cout << "I can't open file!" << endl;
+    std::cout << "I can't open file!" << std::endl;
     return -1;
   }
   // Set Flex to read from it instead of defaulting to STDIN:
