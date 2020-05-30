@@ -10,6 +10,7 @@ id  {letter}({letter}|{digit})*
 inum {digits}
 fnum   {digits}.{digit}("E"{digits}+)?
 arithop "+"|"-"|"*"|"/"|"%"
+boolop  "&&"|"||"
 relop   "=="|"!="|"<="|">="|"<"|">"
 
 /** Extra Options Section**/
@@ -23,10 +24,13 @@ relop   "=="|"!="|"<="|">="|"<"|">"
 "while" { return WHILE;}
 "int"	{ return INT;}
 "float"	{ return FLOAT;}
+"true"  { return TRUE;}
+"false" { return FALSE;}
 {id}    { return IDENTIFIER;}
 {inum}   { return INT_NUM;}
 {fnum} { return FLOAT_NUM;}
 {arithop}  { return ARITH_OP;}
+{boolop}   { return BOOL_OP;}
 {relop} { return REL_OP;}
 "=" { return EQUAL;}
 "," { return COMMA;}

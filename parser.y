@@ -14,10 +14,13 @@
 %token INT_NUM
 %token FLOAT_NUM
 %token ARITH_OP
+%token BOOL_OP
 %token REL_OP
 %token IF
 %token ELSE
 %token WHILE
+%token TRUE
+%token FALSE
 %token INT
 %token FLOAT
 %token EQUAL
@@ -55,7 +58,7 @@ primitive_type:
 
 if: 
     IF LEFT_BRACKET 
-    expression RIGHT_BRACKET
+    boolean_expression RIGHT_BRACKET
     LEFT_BRACE statement_list 
     RIGHT_BRACE ELSE LEFT_BRACE 
     statement_list RIGHT_BRACE
@@ -63,7 +66,7 @@ if:
 
 while: 
         WHILE LEFT_BRACKET
-        expression RIGHT_BRACKET
+        boolean_expression RIGHT_BRACKET
         LEFT_BRACE statement_list RIGHT_BRACE
         ;
 
@@ -72,10 +75,18 @@ assignment: IDENTIFIER EQUAL expression SEMICOLON;
 expression:
             INT_NUM
             |FLOAT_NUM
-            |expression ARITH_OP expression
             |IDENTIFIER
+            |expression ARITH_OP expression
             |LEFT_BRACKET expression RIGHT_BRACKET
             ;
+
+boolean_expression: 
+                    TRUE 
+                    |FALSE
+                    |expression BOOL_OP expression
+                    |expression REL_OP expression
+
+
 %%
 
 int main(int, char**) {

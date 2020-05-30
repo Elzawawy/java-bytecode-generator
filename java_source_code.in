@@ -15,3 +15,16 @@ float zz;
 zz = 1.1;
 x = 6 + y;
 y = z % b;
+
+if(x==5)
+{
+    x=4;
+}
+else 
+{
+    x=5;
+}
+
+while(y  && 7){
+    z=4;
+}
