@@ -14,4 +14,4 @@ n= 500;
 float zz;
 zz = 1.1;
 x = 6 + y;
-y = z / b;
+y = z % b;

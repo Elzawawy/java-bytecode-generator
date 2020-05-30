@@ -28,10 +28,10 @@
 %token LEFT_BRACE
 %token RIGHT_BRACE
 
-
 %%
 method_body: 
-            statement_list
+            %empty
+            |statement_list
             ;
 
 statement_list: 

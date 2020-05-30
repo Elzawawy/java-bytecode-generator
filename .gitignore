@@ -5,3 +5,6 @@
 # Generated Files by Bison
 *.tab.c
 *.tab.h
+
+# Generated Executables
+compiler
