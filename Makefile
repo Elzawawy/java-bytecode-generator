@@ -8,6 +8,6 @@ build_exec:
 	@g++ parser.tab.c lexical_analyzer.yy.c -o java_compiler.out
 
 build_all:
-	@flex -o lexical_analyzer.yy.c java_lexical_analyzer.l 
 	@bison -b parser -d java_parser.y
+	@flex -o lexical_analyzer.yy.c java_lexical_analyzer.l 
 	@g++ parser.tab.c lexical_analyzer.yy.c -o java_compiler.out

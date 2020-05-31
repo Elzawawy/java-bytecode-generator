@@ -13,7 +13,7 @@ where filename, can be any file that contains java source code.
 
 For testing purposes while development use this,
 
-    ./run.sh -debug file_name
+    ./run.sh --debug file_name
 or
 
     ./run.sh -d file_name
