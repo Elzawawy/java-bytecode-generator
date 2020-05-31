@@ -5,6 +5,7 @@
   extern int yylex();
   extern int yyparse();
   extern FILE *yyin;
+  extern int line_num;
   void yyerror(const char *s);
 %}
 
@@ -91,6 +92,10 @@ boolean_expression:
 
 int main(int argc, char** argv) {
   // Open a file handle to a particular file:
+  if (argc == 1){
+    std::cout << "No file's specified to open ! Please provide a valid file name" << std::endl;
+    return -1;
+  }
   FILE *myfile = fopen(argv[1], "r");
   // Make sure it is valid:
   if (!myfile) {
@@ -102,10 +107,10 @@ int main(int argc, char** argv) {
   
   // Parse through the input:
   yyparse();
-  
+  std::cout<<"Yay ! Parser completed working successfully."<<std::endl;
 }
 
 void yyerror(const char *s) {
-  std::cout << "EEK, parse error!  Message: " << s << std::endl;
+  std::cout << "Ouch, I found a parse error on line "<< line_num <<" ! Error Message: " << s << std::endl;
   std::exit(-1);
 }

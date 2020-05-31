@@ -1,8 +1,9 @@
 %{
 #include "parser.tab.h"
+int line_num = 1;
 %}
 /** Regular Epressions Section **/
-whitespace [ \t\n]+
+whitespace [ \t]+
 letter  [a-zA-Z_]
 digit   [0-9]
 digits  {digit}+
@@ -39,4 +40,5 @@ relop   "=="|"!="|"<="|">="|"<"|">"
 ")" { return RIGHT_BRACKET;}
 "{" { return LEFT_BRACE;}
 "}" { return RIGHT_BRACE;}
+\n  { ++line_num;}
 %%
