@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 # re-build program, (flex and Bison and G++ Tools).
 make build_all
 
