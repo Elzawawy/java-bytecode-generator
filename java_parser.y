@@ -24,13 +24,6 @@
 %token FALSE
 %token INT
 %token FLOAT
-%token EQUAL
-%token COMMA
-%token SEMICOLON
-%token LEFT_BRACKET
-%token RIGHT_BRACKET
-%token LEFT_BRACE
-%token RIGHT_BRACE
 
 %%
 method_body: 
@@ -50,7 +43,7 @@ statement:
         |assignment
         ;
 
-declaration: primitive_type IDENTIFIER SEMICOLON;
+declaration: primitive_type IDENTIFIER ';';
 
 primitive_type: 
                 INT 
@@ -58,27 +51,24 @@ primitive_type:
                 ;
 
 if: 
-    IF LEFT_BRACKET 
-    boolean_expression RIGHT_BRACKET
-    LEFT_BRACE statement_list 
-    RIGHT_BRACE ELSE LEFT_BRACE 
-    statement_list RIGHT_BRACE
+    IF '(' boolean_expression ')'
+    '{' statement_list '}' 
+    ELSE '{' statement_list '}'
     ;
 
 while: 
-        WHILE LEFT_BRACKET
-        boolean_expression RIGHT_BRACKET
-        LEFT_BRACE statement_list RIGHT_BRACE
+        WHILE '(' boolean_expression ')'
+        '{' statement_list '}'
         ;
 
-assignment: IDENTIFIER EQUAL expression SEMICOLON;
+assignment: IDENTIFIER '=' expression ';';
 
 expression:
             INT_NUM
             |FLOAT_NUM
             |IDENTIFIER
             |expression ARITH_OP expression
-            |LEFT_BRACKET expression RIGHT_BRACKET
+            |'(' expression ')'
             ;
 
 boolean_expression: 

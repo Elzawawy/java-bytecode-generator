@@ -33,12 +33,6 @@ relop   "=="|"!="|"<="|">="|"<"|">"
 {arithop}  { return ARITH_OP;}
 {boolop}   { return BOOL_OP;}
 {relop} { return REL_OP;}
-"=" { return EQUAL;}
-"," { return COMMA;}
-";" { return SEMICOLON;}
-"(" { return LEFT_BRACKET;}
-")" { return RIGHT_BRACKET;}
-"{" { return LEFT_BRACE;}
-"}" { return RIGHT_BRACE;}
+[\(\)\{\};=,] { return yytext[0];}
 \n  { ++line_num;}
 %%
