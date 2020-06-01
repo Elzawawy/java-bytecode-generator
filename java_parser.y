@@ -1,6 +1,7 @@
 %{
   #include <cstdio>
   #include <iostream>
+  #include semantic_actions_utils.h
 
   extern int yylex();
   extern int yyparse();
