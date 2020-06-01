@@ -10,6 +10,7 @@
 %}
 
 %start method_body
+%error-verbose
 
 %token IDENTIFIER
 %token INT_NUM
