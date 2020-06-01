@@ -8,3 +8,5 @@
 
 # Generated Executables
 *.out
+
+.idea
