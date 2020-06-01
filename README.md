@@ -24,6 +24,16 @@ where file_name is a file that exists in the `test-cases` folder. The extra argu
 
 ### Understanding Flex & Bison
 
-- [Flex & Bison by John Levine. The definitive textbok for them.](http://web.iitd.ac.in/~sumeet/flex__bison.pdf)
-- [Tutorial for complete novices needing to use Flex and Bison for some real project.](https://aquamentus.com/flex_bison.html)
-- [Bison Official Doumentation.](https://www.cs.auckland.ac.nz/references/gnu/bison/bison_toc.html)
+- [Flex & Bison by John Levine. The definitive textbok for using these tools.](http://web.iitd.ac.in/~sumeet/flex__bison.pdf)
+- [Bison Official Doumentation.](https://www.gnu.org/software/bison/manual/html_node/index.html)
+- [Tutorial: Simple Bison Tutorial to start with](http://alumni.cs.ucr.edu/~lgao/teaching/bison.html)
+- [Tutorial: For complete novices needing to use Flex and Bison for some real project,](https://aquamentus.com/flex_bison.html) then watching this complemntery [video](https://www.youtube.com/watch?v=xFN9txVKhUs).
+- [Tutorial: Writing Your Own Toy Compiler Using Flex, Bison and LLVM.](https://gnuu.org/2009/09/18/writing-your-own-toy-compiler/)
+
+### Understanding Java Bytecode
+
+ - [Wiki's Java bytecode](https://en.wikipedia.org/wiki/Java_bytecode) and the [list of the instructions that make up the Java bytecode.](https://en.wikipedia.org/wiki/Java_bytecode_instruction_listings)
+
+### Understanding Jasmin
+
+- [Jasmin Official Documentation.](http://jasmin.sourceforge.net/)
