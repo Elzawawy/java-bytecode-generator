@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <string>
 #include <utility>
+#include <vector>
 
 using namespace std;
 
@@ -15,6 +16,7 @@ namespace semantic_actions_util {
     enum VarType{ INT_TYPE, FLOAT_TYPE };
     unordered_map<string, pair<int, VarType>> varToVarIndexAndType;
     int currentVariableIndex = 1;
+    vector<string> outputCode;
 
     void declareVariable(string name, int varType) {
         if(varToVarIndexAndType.count(name) == 1) 
@@ -23,6 +25,9 @@ namespace semantic_actions_util {
     }
     bool checkIfVariableExists(string varName) {
         return varToVarIndexAndType.count(varName);
+    }
+    void appendToCode(string code) {
+        outputCode.push_back(code);
     }
 
 }
