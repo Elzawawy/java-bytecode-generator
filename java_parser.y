@@ -3,6 +3,8 @@
   #include <iostream>
   #include "semantic_actions_utils.h"
 
+  using namespace semantic_actions_util;
+
   extern int yylex();
   extern int yyparse();
   extern FILE *yyin;
@@ -13,7 +15,7 @@
 %start method_body
 %error-verbose
 
-%token IDENTIFIER
+%token<id> IDENTIFIER
 %token INT_NUM
 %token FLOAT_NUM
 %token ARITH_OP
@@ -26,6 +28,14 @@
 %token FALSE
 %token INT
 %token FLOAT
+
+%type<varType> primitive_type 
+
+
+%union{
+	  char id[30];
+    int varType;
+}
 
 %%
 method_body: 
@@ -45,11 +55,18 @@ statement:
         |assignment
         ;
 
-declaration: primitive_type IDENTIFIER ';';
+declaration: primitive_type IDENTIFIER ';' {
+  printf("my id is  %s \n", $2);
+  if(checkIfVariableExists($2)) {
+    //TODO Do something if the varable already exists
+  } else {
+    declareVariable($2, $1);
+  }
+};
 
 primitive_type: 
-                INT 
-                |FLOAT
+                INT { $$ = VarType::INT_TYPE; }
+                |FLOAT {$$ = VarType::FLOAT_TYPE; }
                 ;
 
 if: 
