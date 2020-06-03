@@ -30,11 +30,14 @@
 %token FLOAT
 
 %type<varType> primitive_type 
-
+%type<expressionType> expression;
 
 %union{
 	  char id[30];
     int varType;
+    struct ExpressionType{
+      int varType;
+    }expressionType;
 }
 
 %%
@@ -56,9 +59,8 @@ statement:
         ;
 
 declaration: primitive_type IDENTIFIER ';' {
-  printf("my id is  %s \n", $2);
   if(checkIfVariableExists($2)) {
-    //TODO Do something if the varable already exists
+    yyerror(string{"variable "+string{$2}+" is already declared"}.data());
   } else {
     declareVariable($2, $1);
   }
@@ -80,14 +82,36 @@ while:
         '{' statement_list '}'
         ;
 
-assignment: IDENTIFIER '=' expression ';';
+assignment: IDENTIFIER '=' expression ';'{
+  cout<<"asg: "<<$1<<" "<<" "<<$3.varType<<endl;
+  if(checkIfVariableExists($1)) {
+    //Check if the two sides have the same type
+    if(varToVarIndexAndType[$1].second == $3.varType) {
+      if(varToVarIndexAndType[$1].second == VarType::INT_TYPE) {
+        appendToCode("istore_"+varToVarIndexAndType[$1].first);
+      } else {//Only int and float are supported
+        appendToCode("fstore_"+varToVarIndexAndType[$1].first);
+      }
+    } else { // case when the two types aren't the same
+      //TODO Cast the two variables
+    }
+  } else {
+    yyerror(string{"variable "+string{$1}+" not declared"}.data());
+  }
+};
 
 expression:
-            INT_NUM
-            |FLOAT_NUM
-            |IDENTIFIER
+            INT_NUM {$$.varType = VarType::INT_TYPE;}
+            |FLOAT_NUM {$$.varType = VarType::FLOAT_TYPE;}
+            |IDENTIFIER {
+              if(checkIfVariableExists($1)) {
+                $$.varType = varToVarIndexAndType[$1].second;
+              } else {
+                //TODO handle the error of variable used but not declared
+              }
+              }
             |expression ARITH_OP expression
-            |'(' expression ')'
+            |'(' expression ')'{}
             ;
 
 boolean_expression: 
