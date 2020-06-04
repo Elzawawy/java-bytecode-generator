@@ -66,18 +66,92 @@ while:
 assignment: IDENTIFIER '=' expression ';';
 
 expression:
-            INT_NUM
-            |FLOAT_NUM
-            |IDENTIFIER
-            |expression ARITH_OP expression
-            |'(' expression ')'
+            INT_NUM {$$.sType = INT_TYPE;  } 
+            |FLOAT_NUM {$$.sType = FLOAT_TYPE ; }
+            |IDENTIFIER {
+
+            // check if the identifier already exist to load or not
+            	if(checkIfVariableExists($1))
+            	{
+            		$$.sType = varToVarIndexAndType[$1].second;
+            		if($$.sType == INT_TYPE )
+            		{
+            		//write iload + identifier
+					appendToCode("iload " + to_string(symbTab[str].first));
+            		}
+            		else
+            		//float
+            		{
+						//write fload + identifier
+					appendToCode("fload " + to_string(symbTab[str].first));
+            		}
+
+
+
+            	}
+            	else //it's not declared at all
+
+            	{
+			string err = "identifier: "+str+" isn't declared in this scope";
+                        yyerror(err.c_str());
+                        $$.sType = ERROR_T;
+            	}
+
+
+
+            }
+            |expression ARITH_OP expression { 
+			
+			if ($1.sType == $3.sType )
+			{
+				if ($1.sType == INT_TYPE)
+					//write 'i' + instruction *get op fx*
+				
+				appendToCode("i" + // get)
+				else //it's float
+					//write 'f' + instruction *get op fx*
+				
+			}
+			
+			
+			
+			
+			}
+            |'(' expression ')' {$$.sType = $2.sType;}
             ;
 
 boolean_expression: 
-                    TRUE 
+                    TRUE
+                    {
+                    $$.trueList = new vector<int> ();
+                    $$.trueList->push_back(codeList.size());
+                    $$.falseList = new vector<int>();
+                    // write code goto line #
+					appendToCode("goto " + //line #)
+
+
+                    }
                     |FALSE
+                    {
+                    $$.trueList = new vector<int> ();
+                    $$.falseList= new vector<int>();
+                    $$.falseList->push_back(codeList.size());
+                    // write code goto line #
+					appendToCode("goto " + //line #)
+
+                    }
                     |expression BOOL_OP expression
+                    {
+
+
+
+                    }
                     |expression REL_OP expression
+                    {
+
+
+
+                    }
 
 
 %%
