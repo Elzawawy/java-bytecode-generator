@@ -1,8 +1,8 @@
 %{
   #include <cstdio>
   #include <iostream>
+  #include <string>
   #include "semantic_actions_utils.h"
-  #include <string.h>
 
   using namespace semantic_actions_util;
 
@@ -48,8 +48,8 @@
 
     struct ExpressionType{
       int varType;
-      std::unordered_set<int> trueList;
-      std::unordered_set<int> falseList;
+      std::unordered_set<int> *trueList = new std::unordered_set<int>;
+      std::unordered_set<int> *falseList = new std::unordered_set<int>;
     }expressionType;
 
     struct MarkerMType{
@@ -57,16 +57,16 @@
     }markerMType;
 
     struct MarkerNType{
-    	std::unordered_set<int> nextList;
+    	std::unordered_set<int> *nextList = new std::unordered_set<int>;
     }markerNType;
 
     struct StatementType{
-    	std::unordered_set<int> nextList;
+    	std::unordered_set<int> *nextList = new std::unordered_set<int>;
     }statementType;
 
     struct BooleanExpressionType{
-    	std::unordered_set<int> trueList;
-        std::unordered_set<int> falseList;
+    	std::unordered_set<int> *trueList = new std::unordered_set<int>;
+        std::unordered_set<int> *falseList = new std::unordered_set<int>;
     }booleanExpressionType;
 }
 
@@ -80,7 +80,7 @@ statement_list:
                 statement
                 |statement_list marker_m statement
                 {
-                  backpatch($1.nextList ,$2.nextInstructionIndex);
+                  backpatch(*($1.nextList) ,$2.nextInstructionIndex);
                   $$.nextList = $3.nextList;
                 }
                 ;
@@ -102,8 +102,8 @@ marker_m:
 marker_n:
 	%empty{
 	  // Save the index of the next instruction index in the marker
-	  $$.nextList = makeList(nextInstructionIndex);
-	  appendCode("goto");
+	  *($$.nextList) = makeList(nextInstructionIndex);
+	  appendToCode("goto");
 	}
 	;
 
@@ -126,20 +126,20 @@ if:
     	'{' statement_list '}'
     	marker_n
     	ELSE '{' marker_m statement_list '}' {
-	   backpatch($3.trueList, $5.nextInstructionIndex);
-	   backpatch($3.falseList, $12.nextInstructionIndex);
-	   std::unordered_set<int> temp = merge ( $7.nextList, $9.nextList);
-	   $$.nextList = merge(temp, $13.nextList );
+	   backpatch(*($3.trueList), $5.nextInstructionIndex);
+	   backpatch(*($3.falseList), $12.nextInstructionIndex);
+	   std::unordered_set<int> temp = mergeLists( *($7.nextList), *($9.nextList));
+	   *($$.nextList) = mergeLists(temp, *($13.nextList));
     	}
     	;
 
 while: 
         WHILE marker_m '(' boolean_expression ')'
         '{' marker_m statement_list '}' {
-           backpatch($8.nextList, $2.nextInstructionIndex);
-           backpatch($4.trueList, $7.nextInstructionIndex);
-           $$.nextList = $4.falseList;
-           appendCode("goto" + $2.nextInstructionIndex);
+           backpatch(*($8.nextList), $2.nextInstructionIndex);
+           backpatch(*($4.trueList), $7.nextInstructionIndex);
+           *($$.nextList) = *($4.falseList);
+           appendToCode("goto" + $2.nextInstructionIndex);
         }
         ;
 
@@ -197,7 +197,7 @@ expression:
 boolean_expression: 
                     TRUE {
                     // $$.trueList = new vector<int> ();
-                    $$.trueList.insert(static_cast<int>(outputCode.size()));
+                    $$.trueList->insert(static_cast<int>(outputCode.size()));
                     // $$.falseList = new vector<int>();
                     // write code goto line #
 					          appendToCode("goto ");
@@ -205,25 +205,25 @@ boolean_expression:
                     |FALSE {
                     // $$.trueList = new vector<int> ();
                     // $$.falseList= new vector<int>();
-                    $$.falseList.insert(static_cast<int>(outputCode.size()));
+                    $$.falseList->insert(static_cast<int>(outputCode.size()));
                     // write code goto line #
 					          appendToCode("goto ");
                     }
                     |expression BOOL_OP expression {
                     if(!strcmp($2, "&&")) {
-                        $$.trueList = $3.trueList;
-                        // $$.falseList = merge($1.falseList,$3.falseList);
+                        *($$.trueList) = *($3.trueList);
+                        *($$.falseList) = mergeLists(*($1.falseList), *($3.falseList));
                       }
                     else if (!strcmp($2,"||")) {
-                        // $$.trueList = merge($1.trueList, $3.trueList);
-                        $$.falseList = $3.falseList;
+                        *($$.trueList) = mergeLists(*($1.trueList), *($3.trueList));
+                        *($$.falseList) = *($3.falseList);
                       }
                     }
                     |expression REL_OP expression {
                     // $$.trueList = new vector<int>();
-                    $$.trueList.insert(static_cast<int>(outputCode.size()));
+                    ($$.trueList)->insert(static_cast<int>(outputCode.size()));
                     // $$.falseList = new vector<int>();
-                    $$.falseList.insert(static_cast<int>(outputCode.size()+1));
+                    ($$.falseList)->insert(static_cast<int>(outputCode.size()+1));
                     appendToCode(getOperationCode($2)+ " ");
                     appendToCode("goto ");
                     }
