@@ -48,7 +48,7 @@ method_body:
 
 statement_list: 
                 statement
-                |statement_list marker statement
+                |statement_list statement
                 {
                   //backpatch(nextlist for statment)
                   //nextlist=goto or marker nextlist
@@ -77,18 +77,9 @@ primitive_type:
 
 if: 
     IF '(' boolean_expression ')'
-    marker
     '{' statement_list '}' 
-    ELSE '{' marker statement_list '}'
+    ELSE '{' statement_list '}'
     ;
-    {
-//
-S ! if ( B ) M 1 S 1 N else M 2 S 2
-{ backpatch ( B: truelist ; M 1 : instr );
-backpatch ( B: falselist ; M 2 : instr );
-temp = merge ( S 1 : nextlist ; N: nextlist );
-S: nextlist = merge ( temp ; S 2 : nextlist ); }
-    }
 
 while: 
         WHILE '(' boolean_expression ')'
