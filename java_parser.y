@@ -1,7 +1,7 @@
 %{
   #include <cstdio>
   #include <iostream>
-  #include <string>
+  #include <string.h>
   #include "semantic_actions_utils.h"
 
   using namespace semantic_actions_util;
@@ -48,8 +48,8 @@
 
     struct ExpressionType{
       int varType;
-      std::unordered_set<int> *trueList = new std::unordered_set<int>;
-      std::unordered_set<int> *falseList = new std::unordered_set<int>;
+      std::unordered_set<int> *trueList;
+      std::unordered_set<int> *falseList;
     }expressionType;
 
     struct MarkerMType{
@@ -57,16 +57,16 @@
     }markerMType;
 
     struct MarkerNType{
-    	std::unordered_set<int> *nextList = new std::unordered_set<int>;
+    	std::unordered_set<int> *nextList;
     }markerNType;
 
     struct StatementType{
-    	std::unordered_set<int> *nextList = new std::unordered_set<int>;
+    	std::unordered_set<int> *nextList;
     }statementType;
 
     struct BooleanExpressionType{
-    	std::unordered_set<int> *trueList = new std::unordered_set<int>;
-        std::unordered_set<int> *falseList = new std::unordered_set<int>;
+    	std::unordered_set<int> *trueList;
+        std::unordered_set<int> *falseList;
     }booleanExpressionType;
 }
 
@@ -86,10 +86,10 @@ statement_list:
                 ;
 
 statement:  
-        declaration 
-        |if 
-        |while 
-        |assignment
+        declaration {$$.nextList = new unordered_set<int>();}
+        |if {$$.nextList=$1.nextList;}
+        |while {$$.nextList=$1.nextList;} 
+        |assignment {$$.nextList = new unordered_set<int>();}
         ;
 
 marker_m:
@@ -102,6 +102,7 @@ marker_m:
 marker_n:
 	%empty{
 	  // Save the index of the next instruction index in the marker
+    $$.nextList = new unordered_set<int>();
 	  *($$.nextList) = makeList(nextInstructionIndex);
 	  appendToCode("goto");
 	}
@@ -126,10 +127,10 @@ if:
     	'{' statement_list '}'
     	marker_n
     	ELSE '{' marker_m statement_list '}' {
-	   backpatch(*($3.trueList), $5.nextInstructionIndex);
-	   backpatch(*($3.falseList), $12.nextInstructionIndex);
-	   std::unordered_set<int> temp = mergeLists( *($7.nextList), *($9.nextList));
-	   *($$.nextList) = mergeLists(temp, *($13.nextList));
+      backpatch(*($3.trueList), $5.nextInstructionIndex);
+      backpatch(*($3.falseList), $12.nextInstructionIndex);
+      std::unordered_set<int> temp = mergeLists( *($7.nextList), *($9.nextList));
+      *($$.nextList) = mergeLists(temp, *($13.nextList));
     	}
     	;
 
@@ -196,15 +197,15 @@ expression:
 
 boolean_expression: 
                     TRUE {
-                    // $$.trueList = new vector<int> ();
+                    $$.trueList = new unordered_set<int> ();
                     $$.trueList->insert(static_cast<int>(outputCode.size()));
-                    // $$.falseList = new vector<int>();
+                    $$.falseList = new unordered_set<int>();
                     // write code goto line #
 					          appendToCode("goto ");
                     }
                     |FALSE {
-                    // $$.trueList = new vector<int> ();
-                    // $$.falseList= new vector<int>();
+                    $$.trueList = new unordered_set<int> ();
+                    $$.falseList= new unordered_set<int>();
                     $$.falseList->insert(static_cast<int>(outputCode.size()));
                     // write code goto line #
 					          appendToCode("goto ");
@@ -220,9 +221,9 @@ boolean_expression:
                       }
                     }
                     |expression REL_OP expression {
-                    // $$.trueList = new vector<int>();
+                    $$.trueList = new unordered_set<int>();
                     ($$.trueList)->insert(static_cast<int>(outputCode.size()));
-                    // $$.falseList = new vector<int>();
+                    $$.falseList = new unordered_set<int>();
                     ($$.falseList)->insert(static_cast<int>(outputCode.size()+1));
                     appendToCode(getOperationCode($2)+ " ");
                     appendToCode("goto ");
