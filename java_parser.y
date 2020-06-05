@@ -65,7 +65,8 @@ statement:
 
 marker:
 	%empty{
-	// get next instruction index
+	  // Save the index of the next instruction index in the marker
+	  $$.next_instruction_index = nextInstructionIndex;
 	}
 	;
 
@@ -89,8 +90,7 @@ if:
     ;
 
 while: 
-        WHILE marker {$2.next_instruction_index = nextInstructionIndex;}
-        '(' boolean_expression ')'
+        WHILE marker '(' boolean_expression ')'
         '{' marker statement_list '}'
         ;
 
