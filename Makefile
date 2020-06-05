@@ -15,3 +15,4 @@ build_all:
 	@flex -o lexical_analyzer.yy.c java_lexical_analyzer.l 
 	@g++ parser.tab.c lexical_analyzer.yy.c -o java_compiler.out
 	@java -jar jasmin.jar java_bytecode.j
+	@java java_class
