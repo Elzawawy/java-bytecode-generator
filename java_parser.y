@@ -1,6 +1,7 @@
 %{
   #include <cstdio>
   #include <iostream>
+  #include <fstream>
   #include "semantic_actions_utils.h"
 
   extern int yylex();
@@ -100,7 +101,13 @@ int main(int argc, char** argv) {
   // Parse through the input:
   yyparse();
   std::cout<<"Yay ! Parser completed working successfully."<<std::endl;
-}
+
+  ofstream java_bytecode_file;
+  java_bytecode_file.open("java_bytecode.j");
+  for(auto instruction: aoutputCode){
+  	java_bytecode_file<< instruction<< endl;
+  }
+  java_bytecode_file.close();
 
 void yyerror(const char *s) {
   std::cout << "Ouch, I found a parse error on line "<< line_num <<" ! Error Message: " << s << std::endl;
