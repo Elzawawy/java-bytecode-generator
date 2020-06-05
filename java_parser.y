@@ -101,6 +101,7 @@ assignment: IDENTIFIER '=' expression ';'{
 };
 
 expression:
+<<<<<<< HEAD
             INT_NUM {$$.varType = VarType::INT_TYPE;}
             |FLOAT_NUM {$$.varType = VarType::FLOAT_TYPE;}
             |IDENTIFIER {
@@ -112,16 +113,134 @@ expression:
               }
             |expression ARITH_OP expression
             |'(' expression ')'{}
+=======
+            INT_NUM {$$.sType = INT_TYPE;  } 
+            |FLOAT_NUM {$$.sType = FLOAT_TYPE ; }
+            |IDENTIFIER {
+
+            // check if the identifier already exist to load or not
+            	if(checkIfVariableExists($1))
+            	{
+            		$$.sType = varToVarIndexAndType[$1].second;
+            		if($$.sType == INT_TYPE )
+            		{
+            		//write iload + identifier
+					appendToCode("iload " + to_string(varToVarIndexAndType[$1].first));
+            		}
+            		else
+            		//float
+            		{
+						//write fload + identifier
+					appendToCode("fload " + to_string(varToVarIndexAndType[$1].first));
+            		}
+
+
+
+            	}
+            	else //it's not declared at all
+
+            	{
+			string err = "identifier: "+$1+" isn't declared in this scope";
+                        yyerror(err.c_str());
+                        $$.sType = ERROR_T;
+            	}
+
+
+
+            }
+            |expression ARITH_OP expression { 
+			
+			if ($1.sType == $3.sType )
+			{
+				if ($1.sType == INT_TYPE)
+					
+				
+				appendToCode("i" + getOperationCode($2) );
+				else //it's float
+					
+				appendToCode("f" + getOperationCode($2) );
+			}
+			
+			
+			
+			
+			}
+            |'(' expression ')' {$$.sType = $2.sType;}
+>>>>>>> feature/expression
             ;
 
 boolean_expression: 
-                    TRUE 
+                    TRUE
+                    {
+                    $$.trueList = new vector<int> ();
+                    $$.trueList->push_back(//code size );
+                    $$.falseList = new vector<int>();
+                    // write code goto line #
+					appendToCode("goto ")
+
+
+                    }
                     |FALSE
+                    {
+                    $$.trueList = new vector<int> ();
+                    $$.falseList= new vector<int>();
+                    $$.falseList->push_back(//code size);
+                    // write code goto line #
+					appendToCode("goto ")
+
+                    }
                     |expression BOOL_OP expression
+                    {
+					if(!strcmp($2, "&&"))
+						{
+							
+							$$.trueList = $3.trueList;
+							$$.falseList = merge($1.falseList,$3.falseList);
+						}
+					else if (!strcmp($2,"||"))
+						{
+							
+							$$.trueList = merge($1.trueList, $3.trueList);
+							$$.falseList = $3.falseList;
+						}
+
+
+                    }
                     |expression REL_OP expression
+                    {
+					$$.trueList = new vector<int>();
+					$$.trueList ->push_back (//code size);
+					
+					$$.falseList = new vector<int>();
+					$$.falseList->push_back(//code size+1);
+					
+					
+					appendToCode(getOperationCode($2)+ " ");
+					appendToCode("goto ");
+
+
+                    }
 
 
 %%
+
+
+string getOperationCode(string operational)
+{
+	    map<string, string>::iterator it ; 
+	    it = mp.find(operational); 
+
+	if(it == opList.end()) 
+        return ""; 
+    else
+       return it->second;
+
+}
+string genLabel()
+{
+	return "L_"+to_string(labelsCount++);
+}
+
 
 int main(int argc, char** argv) {
   // Open a file handle to a particular file:
