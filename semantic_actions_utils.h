@@ -19,8 +19,31 @@ namespace semantic_actions_util {
     };
     unordered_map <string, pair<int, VarType>> varToVarIndexAndType;
     int currentVariableIndex = 1;
+<<<<<<< HEAD
     int nextInstructionIndex = 0;
     vector <string> outputCode;
+=======
+    vector<string> outputCode;
+    int labelsCount = 0;
+    unordered_map<string,string> opList = {
+	    /* arithmetic operations */
+        {"+", "add"},
+        {"-", "sub"},
+        {"/", "div"},
+        {"*", "mul"},
+        {"|", "or"},
+        {"&", "and"},
+        {"%", "rem"},
+
+        /* relational op */
+        {"==", "if_icmpeq"},
+        {"<=", "if_icmple"},
+        {">=", "if_icmpge"},
+        {"!=", "if_icmpne"},
+        {">",  "if_icmpgt"},
+        {"<",  "if_icmplt"}
+    };
+>>>>>>> origin/feature/declaration_assignment_semantic_actions
 
     void declareVariable(string name, int varType) {
         if (varToVarIndexAndType.count(name) == 1)
@@ -115,5 +138,11 @@ namespace semantic_actions_util {
         list1.insert(list2.begin(), list2.end());
         return list1;
     }
+
+    string getOperationCode(string lexeme) {
+        if(opList.count(lexeme) == 0) return "";
+        return opList[lexeme];
+    }	
+
 }
 #endif //SEMANTIC_ACTIONS_UTILS_H
