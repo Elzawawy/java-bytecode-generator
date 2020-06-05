@@ -1,6 +1,7 @@
 %{
   #include <cstdio>
   #include <iostream>
+  #include <string>
   #include "semantic_actions_utils.h"
 
   using namespace semantic_actions_util;
@@ -18,9 +19,9 @@
 %token<id> IDENTIFIER
 %token INT_NUM
 %token FLOAT_NUM
-%token ARITH_OP
-%token BOOL_OP
-%token REL_OP
+%token<smallString> ARITH_OP
+%token <smallString>BOOL_OP
+%token <smallString>REL_OP
 %token IF
 %token ELSE
 %token WHILE
@@ -29,20 +30,44 @@
 %token INT
 %token FLOAT
 
-%type<varType> primitive_type 
+%type<varType> primitive_type
 %type<expressionType> expression
-%type<markerType> marker
+%type<markerMType> marker_m
+%type<markerNType> marker_n
+%type<statementType> statement statement_list while if
+%type<booleanExpressionType> boolean_expression
+
+%code requires{
+    #include <unordered_set>
+}
 
 %union{
-	char id[30];
+    char id[30];
+    char smallString[20];
     int varType;
+
     struct ExpressionType{
       int varType;
+      std::unordered_set<int> *trueList = new std::unordered_set<int>;
+      std::unordered_set<int> *falseList = new std::unordered_set<int>;
     }expressionType;
 
-    struct MarkerType{
+    struct MarkerMType{
 	int nextInstructionIndex;
-    }markerType;
+    }markerMType;
+
+    struct MarkerNType{
+    	std::unordered_set<int> *nextList = new std::unordered_set<int>;
+    }markerNType;
+
+    struct StatementType{
+    	std::unordered_set<int> *nextList = new std::unordered_set<int>;
+    }statementType;
+
+    struct BooleanExpressionType{
+    	std::unordered_set<int> *trueList = new std::unordered_set<int>;
+        std::unordered_set<int> *falseList = new std::unordered_set<int>;
+    }booleanExpressionType;
 }
 
 %%
@@ -53,10 +78,10 @@ method_body:
 
 statement_list: 
                 statement
-                |statement_list statement
+                |statement_list marker_m statement
                 {
-                  //backpatch(nextlist for statment)
-                  //nextlist=goto or marker nextlist
+                  backpatch(*($1.nextList) ,$2.nextInstructionIndex);
+                  $$.nextList = $3.nextList;
                 }
                 ;
 
@@ -67,10 +92,18 @@ statement:
         |assignment
         ;
 
-marker:
+marker_m:
 	%empty{
 	  // Save the index of the next instruction index in the marker
 	  $$.nextInstructionIndex = nextInstructionIndex;
+	}
+	;
+
+marker_n:
+	%empty{
+	  // Save the index of the next instruction index in the marker
+	  *($$.nextList) = makeList(nextInstructionIndex);
+	  appendToCode("goto");
 	}
 	;
 
@@ -87,19 +120,26 @@ primitive_type:
                 |FLOAT {$$ = VarType::FLOAT_TYPE; }
                 ;
 
-if: 
-    IF '(' boolean_expression ')'
-    '{' statement_list '}' 
-    ELSE '{' statement_list '}'
-    ;
+if:
+    	IF '(' boolean_expression ')'
+    	marker_m
+    	'{' statement_list '}'
+    	marker_n
+    	ELSE '{' marker_m statement_list '}' {
+	   backpatch(*($3.trueList), $5.nextInstructionIndex);
+	   backpatch(*($3.falseList), $12.nextInstructionIndex);
+	   std::unordered_set<int> temp = mergeLists( *($7.nextList), *($9.nextList));
+	   *($$.nextList) = mergeLists(temp, *($13.nextList));
+    	}
+    	;
 
 while: 
-        WHILE marker '(' boolean_expression ')'
-        '{' marker statement_list '}' {
-           backpatch($8.nextList, $2.nextInstructionIndex);
-           backpatch($4.trueList, $7.nextInstructionIndex);
-           $$.nextList = $4.falseList;
-           appendCode("goto" + $2.nextInstructionIndex);
+        WHILE marker_m '(' boolean_expression ')'
+        '{' marker_m statement_list '}' {
+           backpatch(*($8.nextList), $2.nextInstructionIndex);
+           backpatch(*($4.trueList), $7.nextInstructionIndex);
+           *($$.nextList) = *($4.falseList);
+           appendToCode("goto" + $2.nextInstructionIndex);
         }
         ;
 
@@ -122,27 +162,79 @@ assignment: IDENTIFIER '=' expression ';'{
 };
 
 expression:
-            INT_NUM {$$.varType = VarType::INT_TYPE;}
-            |FLOAT_NUM {$$.varType = VarType::FLOAT_TYPE;}
+            INT_NUM {$$.varType = VarType::INT_TYPE;  } 
+            |FLOAT_NUM {$$.varType = VarType::FLOAT_TYPE ; }
             |IDENTIFIER {
-              if(checkIfVariableExists($1)) {
-                $$.varType = varToVarIndexAndType[$1].second;
-              } else {
-                //TODO handle the error of variable used but not declared
-              }
-              }
-            |expression ARITH_OP expression
-            |'(' expression ')'{}
+            // check if the identifier already exist to load or not
+            	if(checkIfVariableExists($1)) {
+            		$$.varType = varToVarIndexAndType[$1].second;
+            		if($$.varType == VarType::INT_TYPE ) {
+            		  //write iload + identifier
+					        appendToCode("iload_" + to_string(varToVarIndexAndType[$1].first));
+            		}
+            		else {
+            		  //float 
+						      //write fload + identifier
+					        appendToCode("fload_" + to_string(varToVarIndexAndType[$1].first));
+            		}
+            	}
+            	else {//it's not declared at all
+			                string err = "identifier: "+string{$1}+" isn't declared in this scope";
+                      yyerror(err.c_str());
+            	}
+            }
+            |expression ARITH_OP expression { 
+                if ($1.varType == $3.varType ) {
+                  if ($1.varType == VarType::INT_TYPE)  
+                    appendToCode("i" + getOperationCode($2));
+                  else //it's float          
+                    appendToCode("f" + getOperationCode($2));
+                }
+			        }
+            |'(' expression ')' {$$.varType = $2.varType;}
             ;
 
 boolean_expression: 
-                    TRUE 
-                    |FALSE
-                    |expression BOOL_OP expression
-                    |expression REL_OP expression
-
-
+                    TRUE {
+                    // $$.trueList = new vector<int> ();
+                    $$.trueList->insert(static_cast<int>(outputCode.size()));
+                    // $$.falseList = new vector<int>();
+                    // write code goto line #
+					          appendToCode("goto ");
+                    }
+                    |FALSE {
+                    // $$.trueList = new vector<int> ();
+                    // $$.falseList= new vector<int>();
+                    $$.falseList->insert(static_cast<int>(outputCode.size()));
+                    // write code goto line #
+					          appendToCode("goto ");
+                    }
+                    |expression BOOL_OP expression {
+                    if(!strcmp($2, "&&")) {
+                        *($$.trueList) = *($3.trueList);
+                        *($$.falseList) = mergeLists(*($1.falseList), *($3.falseList));
+                      }
+                    else if (!strcmp($2,"||")) {
+                        *($$.trueList) = mergeLists(*($1.trueList), *($3.trueList));
+                        *($$.falseList) = *($3.falseList);
+                      }
+                    }
+                    |expression REL_OP expression {
+                    // $$.trueList = new vector<int>();
+                    ($$.trueList)->insert(static_cast<int>(outputCode.size()));
+                    // $$.falseList = new vector<int>();
+                    ($$.falseList)->insert(static_cast<int>(outputCode.size()+1));
+                    appendToCode(getOperationCode($2)+ " ");
+                    appendToCode("goto ");
+                    }
+                    ;
 %%
+
+string genLabel()
+{
+	return "L_"+to_string(labelsCount++);
+}
+
 
 int main(int argc, char** argv) {
   // Open a file handle to a particular file:

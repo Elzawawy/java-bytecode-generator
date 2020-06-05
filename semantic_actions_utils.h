@@ -21,6 +21,25 @@ namespace semantic_actions_util {
     int currentVariableIndex = 1;
     int nextInstructionIndex = 0;
     vector <string> outputCode;
+    int labelsCount = 0;
+    unordered_map<string,string> opList = {
+	    /* arithmetic operations */
+        {"+", "add"},
+        {"-", "sub"},
+        {"/", "div"},
+        {"*", "mul"},
+        {"|", "or"},
+        {"&", "and"},
+        {"%", "rem"},
+
+        /* relational op */
+        {"==", "if_icmpeq"},
+        {"<=", "if_icmple"},
+        {">=", "if_icmpge"},
+        {"!=", "if_icmpne"},
+        {">",  "if_icmpgt"},
+        {"<",  "if_icmplt"}
+    };
 
     void declareVariable(string name, int varType) {
         if (varToVarIndexAndType.count(name) == 1)
@@ -42,39 +61,38 @@ namespace semantic_actions_util {
             outputCode[index] += to_string(instruction_index);
         }
     }
+
     void defineVariable(string name, int varType) {
-        declareVariable(name,varType);
-        if(varType==INT_TYPE){
-            appendToCode("iconst_0\nistore_"+to_string(currentVariableIndex));
-        }
-        else if(varType==FLOAT_TYPE){
-            appendToCode("fconst0\nfstore_"+to_string(currentVariableIndex));
+        declareVariable(name, varType);
+        if (varType == INT_TYPE) {
+            appendToCode("iconst_0\nistore_" + to_string(currentVariableIndex));
+        } else if (varType == FLOAT_TYPE) {
+            appendToCode("fconst0\nfstore_" + to_string(currentVariableIndex));
         }
 
     }
-    void generateHeader()
-    {
-    //TO-DO get file name
-	//appendToCode(".source " + outfileName);
-	appendToCode(".class public test\n.super java/lang/Object\n"); 
-	appendToCode(".method public <init>()V");
-	appendToCode("aload_0");
-	appendToCode("invokenonvirtual java/lang/Object/<init>()V");
-	appendToCode("return");
-	appendToCode(".end method\n");
-	appendToCode(".method public static main([Ljava/lang/String;)V");
-	appendToCode(".limit locals 100\n.limit stack 100");
 
-	defineVariable("1syso_int_var",INT_TYPE);
-	defineVariable("1syso_float_var",FLOAT_TYPE);
+    void generateHeader() {
+        //TO-DO get file name
+        //appendToCode(".source " + outfileName);
+        appendToCode(".class public test\n.super java/lang/Object\n");
+        appendToCode(".method public <init>()V");
+        appendToCode("aload_0");
+        appendToCode("invokenonvirtual java/lang/Object/<init>()V");
+        appendToCode("return");
+        appendToCode(".end method\n");
+        appendToCode(".method public static main([Ljava/lang/String;)V");
+        appendToCode(".limit locals 100\n.limit stack 100");
 
-	appendToCode(".line 1");
-}
+        defineVariable("1syso_int_var", INT_TYPE);
+        defineVariable("1syso_float_var", FLOAT_TYPE);
 
-    void generateFooter()
-    {
-	appendToCode("return");
-	appendToCode(".end method");
+        appendToCode(".line 1");
+    }
+
+    void generateFooter() {
+        appendToCode("return");
+        appendToCode(".end method");
     }
 
     unordered_set<int> makeList(int instruction_index) {
@@ -87,5 +105,11 @@ namespace semantic_actions_util {
         list1.insert(list2.begin(), list2.end());
         return list1;
     }
+
+    string getOperationCode(string lexeme) {
+        if(opList.count(lexeme) == 0) return "";
+        return opList[lexeme];
+    }	
+
 }
 #endif //SEMANTIC_ACTIONS_UTILS_H
