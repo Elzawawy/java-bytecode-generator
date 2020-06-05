@@ -2,6 +2,7 @@
   #include <cstdio>
   #include <iostream>
   #include "semantic_actions_utils.h"
+  #include <string.h>
 
   using namespace semantic_actions_util;
 
@@ -18,9 +19,9 @@
 %token<id> IDENTIFIER
 %token INT_NUM
 %token FLOAT_NUM
-%token ARITH_OP
-%token BOOL_OP
-%token REL_OP
+%token<smallString> ARITH_OP
+%token <smallString>BOOL_OP
+%token <smallString>REL_OP
 %token IF
 %token ELSE
 %token WHILE
@@ -31,13 +32,25 @@
 
 %type<varType> primitive_type 
 %type<expressionType> expression;
+%type<booleanExpressionType> boolean_expression;
+
+%code requires{
+    #include <unordered_set>
+}
 
 %union{
+    char smallString[20];
 	  char id[30];
     int varType;
     struct ExpressionType{
       int varType;
+      std::unordered_set<int> trueList;
+      std::unordered_set<int> falseList;
     }expressionType;
+    struct BooleanExpressionType{
+    	std::unordered_set<int> trueList;
+      std::unordered_set<int> falseList;
+    }booleanExpressionType;
 }
 
 %%
@@ -101,141 +114,74 @@ assignment: IDENTIFIER '=' expression ';'{
 };
 
 expression:
-<<<<<<< HEAD
-            INT_NUM {$$.varType = VarType::INT_TYPE;}
-            |FLOAT_NUM {$$.varType = VarType::FLOAT_TYPE;}
+            INT_NUM {$$.varType = VarType::INT_TYPE;  } 
+            |FLOAT_NUM {$$.varType = VarType::FLOAT_TYPE ; }
             |IDENTIFIER {
-              if(checkIfVariableExists($1)) {
-                $$.varType = varToVarIndexAndType[$1].second;
-              } else {
-                //TODO handle the error of variable used but not declared
-              }
-              }
-            |expression ARITH_OP expression
-            |'(' expression ')'{}
-=======
-            INT_NUM {$$.sType = INT_TYPE;  } 
-            |FLOAT_NUM {$$.sType = FLOAT_TYPE ; }
-            |IDENTIFIER {
-
             // check if the identifier already exist to load or not
-            	if(checkIfVariableExists($1))
-            	{
-            		$$.sType = varToVarIndexAndType[$1].second;
-            		if($$.sType == INT_TYPE )
-            		{
-            		//write iload + identifier
-					appendToCode("iload " + to_string(varToVarIndexAndType[$1].first));
+            	if(checkIfVariableExists($1)) {
+            		$$.varType = varToVarIndexAndType[$1].second;
+            		if($$.varType == VarType::INT_TYPE ) {
+            		  //write iload + identifier
+					        appendToCode("iload_" + to_string(varToVarIndexAndType[$1].first));
             		}
-            		else
-            		//float
-            		{
-						//write fload + identifier
-					appendToCode("fload " + to_string(varToVarIndexAndType[$1].first));
+            		else {
+            		  //float 
+						      //write fload + identifier
+					        appendToCode("fload_" + to_string(varToVarIndexAndType[$1].first));
             		}
-
-
-
             	}
-            	else //it's not declared at all
-
-            	{
-			string err = "identifier: "+$1+" isn't declared in this scope";
-                        yyerror(err.c_str());
-                        $$.sType = ERROR_T;
+            	else {//it's not declared at all
+			                string err = "identifier: "+string{$1}+" isn't declared in this scope";
+                      yyerror(err.c_str());
             	}
-
-
-
             }
             |expression ARITH_OP expression { 
-			
-			if ($1.sType == $3.sType )
-			{
-				if ($1.sType == INT_TYPE)
-					
-				
-				appendToCode("i" + getOperationCode($2) );
-				else //it's float
-					
-				appendToCode("f" + getOperationCode($2) );
-			}
-			
-			
-			
-			
-			}
-            |'(' expression ')' {$$.sType = $2.sType;}
->>>>>>> feature/expression
+                if ($1.varType == $3.varType ) {
+                  if ($1.varType == VarType::INT_TYPE)  
+                    appendToCode("i" + getOperationCode($2));
+                  else //it's float          
+                    appendToCode("f" + getOperationCode($2));
+                }
+			        }
+            |'(' expression ')' {$$.varType = $2.varType;}
             ;
 
 boolean_expression: 
-                    TRUE
-                    {
-                    $$.trueList = new vector<int> ();
-                    $$.trueList->push_back(//code size );
-                    $$.falseList = new vector<int>();
+                    TRUE {
+                    // $$.trueList = new vector<int> ();
+                    $$.trueList.insert(static_cast<int>(outputCode.size()));
+                    // $$.falseList = new vector<int>();
                     // write code goto line #
-					appendToCode("goto ")
-
-
+					          appendToCode("goto ");
                     }
-                    |FALSE
-                    {
-                    $$.trueList = new vector<int> ();
-                    $$.falseList= new vector<int>();
-                    $$.falseList->push_back(//code size);
+                    |FALSE {
+                    // $$.trueList = new vector<int> ();
+                    // $$.falseList= new vector<int>();
+                    $$.falseList.insert(static_cast<int>(outputCode.size()));
                     // write code goto line #
-					appendToCode("goto ")
-
+					          appendToCode("goto ");
                     }
-                    |expression BOOL_OP expression
-                    {
-					if(!strcmp($2, "&&"))
-						{
-							
-							$$.trueList = $3.trueList;
-							$$.falseList = merge($1.falseList,$3.falseList);
-						}
-					else if (!strcmp($2,"||"))
-						{
-							
-							$$.trueList = merge($1.trueList, $3.trueList);
-							$$.falseList = $3.falseList;
-						}
-
-
+                    |expression BOOL_OP expression {
+                    if(!strcmp($2, "&&")) {
+                        $$.trueList = $3.trueList;
+                        // $$.falseList = merge($1.falseList,$3.falseList);
+                      }
+                    else if (!strcmp($2,"||")) {
+                        // $$.trueList = merge($1.trueList, $3.trueList);
+                        $$.falseList = $3.falseList;
+                      }
                     }
-                    |expression REL_OP expression
-                    {
-					$$.trueList = new vector<int>();
-					$$.trueList ->push_back (//code size);
-					
-					$$.falseList = new vector<int>();
-					$$.falseList->push_back(//code size+1);
-					
-					
-					appendToCode(getOperationCode($2)+ " ");
-					appendToCode("goto ");
-
-
+                    |expression REL_OP expression {
+                    // $$.trueList = new vector<int>();
+                    $$.trueList.insert(static_cast<int>(outputCode.size()));
+                    // $$.falseList = new vector<int>();
+                    $$.falseList.insert(static_cast<int>(outputCode.size()+1));
+                    appendToCode(getOperationCode($2)+ " ");
+                    appendToCode("goto ");
                     }
-
-
+                    ;
 %%
 
-
-string getOperationCode(string operational)
-{
-	    map<string, string>::iterator it ; 
-	    it = mp.find(operational); 
-
-	if(it == opList.end()) 
-        return ""; 
-    else
-       return it->second;
-
-}
 string genLabel()
 {
 	return "L_"+to_string(labelsCount++);
