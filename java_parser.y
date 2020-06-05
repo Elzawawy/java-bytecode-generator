@@ -68,7 +68,7 @@ method_body:
 
 statement_list: 
                 statement
-                |statement_list marker statement
+                |statement_list statement
                 {
                   backpatch($1.nextList ,$2.nextInstructionIndex);
                   $$.nextList = $3.nextList;
@@ -102,7 +102,7 @@ primitive_type:
                 |FLOAT {$$ = VarType::FLOAT_TYPE; }
                 ;
 
-if: 
+if:
     	IF '(' boolean_expression ')'
     	marker
     	'{' statement_list '}'
@@ -134,7 +134,7 @@ assignment: IDENTIFIER '=' expression ';'{
         appendToCode("istore_"+varToVarIndexAndType[$1].first);
       } else {//Only int and float are supported
         appendToCode("fstore_"+varToVarIndexAndType[$1].first);
-      }writeCode
+      }
     } else { // case when the two types aren't the same
       //TODO Cast the two variables
     }
