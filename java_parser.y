@@ -30,14 +30,19 @@
 %token FLOAT
 
 %type<varType> primitive_type 
-%type<expressionType> expression;
+%type<expressionType> expression
+%type<markerType> marker
 
 %union{
-	  char id[30];
+	char id[30];
     int varType;
     struct ExpressionType{
       int varType;
     }expressionType;
+
+    struct MarkerType{
+	int nextInstructionIndex;
+    }markerType;
 }
 
 %%
@@ -62,6 +67,13 @@ statement:
         |assignment
         ;
 
+marker:
+	%empty{
+	  // Save the index of the next instruction index in the marker
+	  $$.nextInstructionIndex = nextInstructionIndex;
+	}
+	;
+
 declaration: primitive_type IDENTIFIER ';' {
   if(checkIfVariableExists($2)) {
     yyerror(string{"variable "+string{$2}+" is already declared"}.data());
@@ -82,8 +94,13 @@ if:
     ;
 
 while: 
-        WHILE '(' boolean_expression ')'
-        '{' statement_list '}'
+        WHILE marker '(' boolean_expression ')'
+        '{' marker statement_list '}' {
+           backpatch($8.nextList, $2.nextInstructionIndex);
+           backpatch($4.trueList, $7.nextInstructionIndex);
+           $$.nextList = $4.falseList;
+           appendCode("goto" + $2.nextInstructionIndex);
+        }
         ;
 
 assignment: IDENTIFIER '=' expression ';'{
