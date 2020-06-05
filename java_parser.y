@@ -48,12 +48,16 @@
 %%
 method_body: 
             %empty
-            |statement_list
+            |{generateHeader();}statement_list{generateFooter();}
             ;
 
 statement_list: 
                 statement
-                |statement_list statement
+                |statement_list marker statement
+                {
+                  //backpatch(nextlist for statment)
+                  //nextlist=goto or marker nextlist
+                }
                 ;
 
 statement:  
@@ -85,9 +89,18 @@ primitive_type:
 
 if: 
     IF '(' boolean_expression ')'
+    marker
     '{' statement_list '}' 
-    ELSE '{' statement_list '}'
+    ELSE '{' marker statement_list '}'
     ;
+    {
+//
+S ! if ( B ) M 1 S 1 N else M 2 S 2
+{ backpatch ( B: truelist ; M 1 : instr );
+backpatch ( B: falselist ; M 2 : instr );
+temp = merge ( S 1 : nextlist ; N: nextlist );
+S: nextlist = merge ( temp ; S 2 : nextlist ); }
+    }
 
 while: 
         WHILE marker '(' boolean_expression ')'
@@ -108,7 +121,7 @@ assignment: IDENTIFIER '=' expression ';'{
         appendToCode("istore_"+varToVarIndexAndType[$1].first);
       } else {//Only int and float are supported
         appendToCode("fstore_"+varToVarIndexAndType[$1].first);
-      }
+      }writeCode
     } else { // case when the two types aren't the same
       //TODO Cast the two variables
     }
@@ -159,6 +172,7 @@ int main(int argc, char** argv) {
   yyparse();
   std::cout<<"Yay ! Parser completed working successfully."<<std::endl;
 }
+
 
 void yyerror(const char *s) {
   std::cout << "Ouch, I found a parse error on line "<< line_num <<" ! Error Message: " << s << std::endl;
