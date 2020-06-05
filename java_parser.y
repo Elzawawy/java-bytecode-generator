@@ -95,7 +95,7 @@ assignment: IDENTIFIER '=' expression ';'{
         appendToCode("istore_"+varToVarIndexAndType[$1].first);
       } else {//Only int and float are supported
         appendToCode("fstore_"+varToVarIndexAndType[$1].first);
-      }writeCode
+      }
     } else { // case when the two types aren't the same
       //TODO Cast the two variables
     }

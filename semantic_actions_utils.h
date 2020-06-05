@@ -41,7 +41,8 @@ namespace semantic_actions_util {
     }
     void generateHeader()
     {
-	appendToCode(".source " + outfileName);
+    //TO-DO get file name
+	//appendToCode(".source " + outfileName);
 	appendToCode(".class public test\n.super java/lang/Object\n"); //code for defining class
 	appendToCode(".method public <init>()V");
 	appendToCode("aload_0");
