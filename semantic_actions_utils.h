@@ -52,8 +52,8 @@ namespace semantic_actions_util {
 	appendToCode(".limit locals 100\n.limit stack 100");
 
 	/* generate temporal vars for syso */
-	declareVariable("1syso_int_var",INT_T);
-	declareVariable("1syso_float_var",FLOAT_T);
+	defineVariable("1syso_int_var",INT_T);
+	defineVariable("1syso_float_var",FLOAT_T);
 
 	/*generate line*/
 	appendToCode(".line 1");
