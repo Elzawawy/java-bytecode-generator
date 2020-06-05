@@ -19,6 +19,7 @@ namespace semantic_actions_util {
     };
     unordered_map <string, pair<int, VarType>> varToVarIndexAndType;
     int currentVariableIndex = 1;
+    int nextInstructionIndex = 0;
     vector <string> outputCode;
 
     void declareVariable(string name, int varType) {
@@ -33,6 +34,7 @@ namespace semantic_actions_util {
 
     void appendToCode(string code) {
         outputCode.push_back(code);
+        nextInstructionIndex++;
     }
 
     void backpatch(unordered_set<int> list, int instruction_index) {

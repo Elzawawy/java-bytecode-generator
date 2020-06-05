@@ -30,14 +30,19 @@
 %token FLOAT
 
 %type<varType> primitive_type 
-%type<expressionType> expression;
+%type<expressionType> expression
+%type<markerType> marker
 
 %union{
-	  char id[30];
+	char id[30];
     int varType;
     struct ExpressionType{
       int varType;
     }expressionType;
+
+    struct MarkerType{
+	int next_instruction_index;
+    }markerType;
 }
 
 %%
@@ -57,6 +62,12 @@ statement:
         |while 
         |assignment
         ;
+
+marker:
+	%empty{
+	// get next instruction index
+	}
+	;
 
 declaration: primitive_type IDENTIFIER ';' {
   if(checkIfVariableExists($2)) {
@@ -78,8 +89,9 @@ if:
     ;
 
 while: 
-        WHILE '(' boolean_expression ')'
-        '{' statement_list '}'
+        WHILE marker {$2.next_instruction_index = nextInstructionIndex;}
+        '(' boolean_expression ')'
+        '{' marker statement_list '}'
         ;
 
 assignment: IDENTIFIER '=' expression ';'{
