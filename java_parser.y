@@ -77,13 +77,13 @@ expression:
             		if($$.sType == INT_TYPE )
             		{
             		//write iload + identifier
-					appendToCode("iload " + to_string(varToVarIndexAndType[str].first));
+					appendToCode("iload " + to_string(varToVarIndexAndType[$1].first));
             		}
             		else
             		//float
             		{
 						//write fload + identifier
-					appendToCode("fload " + to_string(varToVarIndexAndType[str].first));
+					appendToCode("fload " + to_string(varToVarIndexAndType[$1].first));
             		}
 
 
@@ -92,7 +92,7 @@ expression:
             	else //it's not declared at all
 
             	{
-			string err = "identifier: "+str+" isn't declared in this scope";
+			string err = "identifier: "+$1+" isn't declared in this scope";
                         yyerror(err.c_str());
                         $$.sType = ERROR_T;
             	}
@@ -135,7 +135,7 @@ boolean_expression:
                     {
                     $$.trueList = new vector<int> ();
                     $$.falseList= new vector<int>();
-                    $$.falseList->push_back(//size of old);
+                    $$.falseList->push_back(//code size);
                     // write code goto line #
 					appendToCode("goto ")
 
