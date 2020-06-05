@@ -31,7 +31,8 @@
 
 %type<varType> primitive_type 
 %type<expressionType> expression
-%type<markerType> marker
+%type<markerMType> marker_m
+%type<markerNType> marker_n
 %type<statementType> statement statement_list while
 %type<booleanExpressionType> boolean_expression
 
@@ -46,9 +47,13 @@
       int varType;
     }expressionType;
 
-    struct MarkerType{
+    struct MarkerMType{
 	int nextInstructionIndex;
-    }markerType;
+    }markerMType;
+
+    struct MarkerNType{
+    	std::unordered_set<int> nextList;
+    }markerNType;
 
     struct StatementType{
     	std::unordered_set<int> nextList;
@@ -68,7 +73,7 @@ method_body:
 
 statement_list: 
                 statement
-                |statement_list statement
+                |statement_list marker_m statement
                 {
                   backpatch($1.nextList ,$2.nextInstructionIndex);
                   $$.nextList = $3.nextList;
@@ -82,10 +87,18 @@ statement:
         |assignment
         ;
 
-marker:
+marker_m:
 	%empty{
 	  // Save the index of the next instruction index in the marker
 	  $$.nextInstructionIndex = nextInstructionIndex;
+	}
+	;
+
+marker_n:
+	%empty{
+	  // Save the index of the next instruction index in the marker
+	  $$.nextList = makeList(nextInstructionIndex);
+	  appendCode("goto");
 	}
 	;
 
@@ -104,20 +117,20 @@ primitive_type:
 
 if:
     	IF '(' boolean_expression ')'
-    	marker
+    	marker_m
     	'{' statement_list '}'
-    	ELSE '{' marker statement_list '}' {
-	   S ! if ( B ) M 1 S 1 N else M 2 S 2
-	   { backpatch ( B: truelist ; M 1 : instr );
-	   backpatch ( B: falselist ; M 2 : instr );
-	   temp = merge ( S 1 : nextlist ; N: nextlist );
-	   S: nextlist = merge ( temp ; S 2 : nextlist ); }
+    	marker_n
+    	ELSE '{' marker_m statement_list '}' {
+	   backpatch($3.truelist, $5.nextInstructionIndex);
+	   backpatch($3.falselist, $12.nextInstructionIndex);
+	   std::unordered_set<int> temp = merge ( $7.nextList, $9.nextList);
+	   $$.nextlist = merge(temp, $13.nextlist );
     	}
     	;
 
 while: 
-        WHILE marker '(' boolean_expression ')'
-        '{' marker statement_list '}' {
+        WHILE marker_m '(' boolean_expression ')'
+        '{' marker_m statement_list '}' {
            backpatch($8.nextList, $2.nextInstructionIndex);
            backpatch($4.trueList, $7.nextInstructionIndex);
            $$.nextList = $4.falseList;

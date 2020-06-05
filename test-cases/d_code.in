@@ -1,3 +1,6 @@
+int y;
+int z;
+y = 7;
 while(y  && 7){
     z=4;
 }
