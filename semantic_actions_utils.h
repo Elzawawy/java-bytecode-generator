@@ -43,7 +43,7 @@ namespace semantic_actions_util {
     {
     //TO-DO get file name
 	//appendToCode(".source " + outfileName);
-	appendToCode(".class public test\n.super java/lang/Object\n"); //code for defining class
+	appendToCode(".class public test\n.super java/lang/Object\n"); 
 	appendToCode(".method public <init>()V");
 	appendToCode("aload_0");
 	appendToCode("invokenonvirtual java/lang/Object/<init>()V");
@@ -52,11 +52,9 @@ namespace semantic_actions_util {
 	appendToCode(".method public static main([Ljava/lang/String;)V");
 	appendToCode(".limit locals 100\n.limit stack 100");
 
-	/* generate temporal vars for syso */
 	defineVariable("1syso_int_var",INT_TYPE);
 	defineVariable("1syso_float_var",FLOAT_TYPE);
 
-	/*generate line*/
 	appendToCode(".line 1");
 }
 
