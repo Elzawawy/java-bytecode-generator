@@ -77,13 +77,13 @@ expression:
             		if($$.sType == INT_TYPE )
             		{
             		//write iload + identifier
-					appendToCode("iload " + to_string(symbTab[str].first));
+					appendToCode("iload " + to_string(varToVarIndexAndType[str].first));
             		}
             		else
             		//float
             		{
 						//write fload + identifier
-					appendToCode("fload " + to_string(symbTab[str].first));
+					appendToCode("fload " + to_string(varToVarIndexAndType[str].first));
             		}
 
 
@@ -105,12 +105,12 @@ expression:
 			if ($1.sType == $3.sType )
 			{
 				if ($1.sType == INT_TYPE)
-					//write 'i' + instruction *get op fx*
+					
 				
-				appendToCode("i" + // get)
+				appendToCode("i" + getOperationCode($2) );
 				else //it's float
-					//write 'f' + instruction *get op fx*
-				
+					
+				appendToCode("f" + getOperationCode($2) );
 			}
 			
 			
@@ -124,10 +124,10 @@ boolean_expression:
                     TRUE
                     {
                     $$.trueList = new vector<int> ();
-                    $$.trueList->push_back(codeList.size());
+                    $$.trueList->push_back(//code size );
                     $$.falseList = new vector<int>();
                     // write code goto line #
-					appendToCode("goto " + //line #)
+					appendToCode("goto ")
 
 
                     }
@@ -135,26 +135,63 @@ boolean_expression:
                     {
                     $$.trueList = new vector<int> ();
                     $$.falseList= new vector<int>();
-                    $$.falseList->push_back(codeList.size());
+                    $$.falseList->push_back(//size of old);
                     // write code goto line #
-					appendToCode("goto " + //line #)
+					appendToCode("goto ")
 
                     }
                     |expression BOOL_OP expression
                     {
-
+					if(!strcmp($2, "&&"))
+						{
+							
+							$$.trueList = $3.trueList;
+							$$.falseList = merge($1.falseList,$3.falseList);
+						}
+					else if (!strcmp($2,"||"))
+						{
+							
+							$$.trueList = merge($1.trueList, $3.trueList);
+							$$.falseList = $3.falseList;
+						}
 
 
                     }
                     |expression REL_OP expression
                     {
-
+					$$.trueList = new vector<int>();
+					$$.trueList ->push_back (//code size);
+					
+					$$.falseList = new vector<int>();
+					$$.falseList->push_back(//code size+1);
+					
+					
+					appendToCode(getOperationCode($2)+ " ");
+					appendToCode("goto ");
 
 
                     }
 
 
 %%
+
+
+string getOperationCode(string operational)
+{
+	    map<string, string>::iterator it ; 
+	    it = mp.find(operational); 
+
+	if(it == opList.end()) 
+        return ""; 
+    else
+       return it->second;
+
+}
+string genLabel()
+{
+	return "L_"+to_string(labelsCount++);
+}
+
 
 int main(int argc, char** argv) {
   // Open a file handle to a particular file:
