@@ -42,40 +42,39 @@ namespace semantic_actions_util {
             outputCode[index] += to_string(instruction_index);
         }
     }
+
     void defineVariable(string name, int varType) {
-        declareVariable(name,varType);
-        if(varType==INT_T){
-            appendToCode("iconst_0\nistore_"+to_string(currentVariableIndex));
-        }
-        else if(varType==FLOAT_T){
-            appendToCode("fconst0\nfstore_"+to_string(currentVariableIndex));
+        declareVariable(name, varType);
+        if (varType == INT_T) {
+            appendToCode("iconst_0\nistore_" + to_string(currentVariableIndex));
+        } else if (varType == FLOAT_T) {
+            appendToCode("fconst0\nfstore_" + to_string(currentVariableIndex));
         }
 
     }
-    void generateHeader()
-    {
-	appendToCode(".source " + outfileName);
-	appendToCode(".class public test\n.super java/lang/Object\n"); //code for defining class
-	appendToCode(".method public <init>()V");
-	appendToCode("aload_0");
-	appendToCode("invokenonvirtual java/lang/Object/<init>()V");
-	appendToCode("return");
-	appendToCode(".end method\n");
-	appendToCode(".method public static main([Ljava/lang/String;)V");
-	appendToCode(".limit locals 100\n.limit stack 100");
 
-	/* generate temporal vars for syso */
-	declareVariable("1syso_int_var",INT_T);
-	declareVariable("1syso_float_var",FLOAT_T);
+    void generateHeader() {
+        appendToCode(".source " + outfileName);
+        appendToCode(".class public test\n.super java/lang/Object\n"); //code for defining class
+        appendToCode(".method public <init>()V");
+        appendToCode("aload_0");
+        appendToCode("invokenonvirtual java/lang/Object/<init>()V");
+        appendToCode("return");
+        appendToCode(".end method\n");
+        appendToCode(".method public static main([Ljava/lang/String;)V");
+        appendToCode(".limit locals 100\n.limit stack 100");
 
-	/*generate line*/
-	appendToCode(".line 1");
-}
+        /* generate temporal vars for syso */
+        declareVariable("1syso_int_var", INT_T);
+        declareVariable("1syso_float_var", FLOAT_T);
 
-    void generateFooter()
-    {
-	appendToCode("return");
-	appendToCode(".end method");
+        /*generate line*/
+        appendToCode(".line 1");
+    }
+
+    void generateFooter() {
+        appendToCode("return");
+        appendToCode(".end method");
     }
 
     unordered_set<int> makeList(int instruction_index) {

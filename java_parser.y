@@ -32,9 +32,15 @@
 %type<varType> primitive_type 
 %type<expressionType> expression
 %type<markerType> marker
+%type<statementType> statement statement_list while
+%type<booleanExpressionType> boolean_expression
+
+%code requires{
+    #include <unordered_set>
+}
 
 %union{
-	char id[30];
+    char id[30];
     int varType;
     struct ExpressionType{
       int varType;
@@ -43,6 +49,15 @@
     struct MarkerType{
 	int nextInstructionIndex;
     }markerType;
+
+    struct StatementType{
+    	std::unordered_set<int> nextList;
+    }statementType;
+
+    struct BooleanExpressionType{
+    	std::unordered_set<int> trueList;
+        std::unordered_set<int> falseList;
+    }booleanExpressionType;
 }
 
 %%
@@ -55,8 +70,8 @@ statement_list:
                 statement
                 |statement_list marker statement
                 {
-                  //backpatch(nextlist for statment)
-                  //nextlist=goto or marker nextlist
+                  backpatch($1.nextList ,$2.nextInstructionIndex);
+                  $$.nextList = $3.nextList;
                 }
                 ;
 
@@ -88,19 +103,17 @@ primitive_type:
                 ;
 
 if: 
-    IF '(' boolean_expression ')'
-    marker
-    '{' statement_list '}' 
-    ELSE '{' marker statement_list '}'
-    ;
-    {
-//
-S ! if ( B ) M 1 S 1 N else M 2 S 2
-{ backpatch ( B: truelist ; M 1 : instr );
-backpatch ( B: falselist ; M 2 : instr );
-temp = merge ( S 1 : nextlist ; N: nextlist );
-S: nextlist = merge ( temp ; S 2 : nextlist ); }
-    }
+    	IF '(' boolean_expression ')'
+    	marker
+    	'{' statement_list '}'
+    	ELSE '{' marker statement_list '}' {
+	   S ! if ( B ) M 1 S 1 N else M 2 S 2
+	   { backpatch ( B: truelist ; M 1 : instr );
+	   backpatch ( B: falselist ; M 2 : instr );
+	   temp = merge ( S 1 : nextlist ; N: nextlist );
+	   S: nextlist = merge ( temp ; S 2 : nextlist ); }
+    	}
+    	;
 
 while: 
         WHILE marker '(' boolean_expression ')'
