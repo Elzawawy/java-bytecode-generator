@@ -19,11 +19,8 @@ namespace semantic_actions_util {
     };
     unordered_map <string, pair<int, VarType>> varToVarIndexAndType;
     int currentVariableIndex = 1;
-<<<<<<< HEAD
     int nextInstructionIndex = 0;
     vector <string> outputCode;
-=======
-    vector<string> outputCode;
     int labelsCount = 0;
     unordered_map<string,string> opList = {
 	    /* arithmetic operations */
@@ -43,7 +40,6 @@ namespace semantic_actions_util {
         {">",  "if_icmpgt"},
         {"<",  "if_icmplt"}
     };
->>>>>>> origin/feature/declaration_assignment_semantic_actions
 
     void declareVariable(string name, int varType) {
         if (varToVarIndexAndType.count(name) == 1)
@@ -64,16 +60,6 @@ namespace semantic_actions_util {
         for (auto index : list) {
             outputCode[index] += to_string(instruction_index);
         }
-    }
-
-    void defineVariable(string name, int varType) {
-        declareVariable(name, varType);
-        if (varType == INT_T) {
-            appendToCode("iconst_0\nistore_" + to_string(currentVariableIndex));
-        } else if (varType == FLOAT_T) {
-            appendToCode("fconst0\nfstore_" + to_string(currentVariableIndex));
-        }
-
     }
 
     void defineVariable(string name, int varType) {
@@ -101,25 +87,6 @@ namespace semantic_actions_util {
         defineVariable("1syso_int_var", INT_TYPE);
         defineVariable("1syso_float_var", FLOAT_TYPE);
 
-        appendToCode(".line 1");
-    }
-
-    void generateHeader() {
-        appendToCode(".source " + outfileName);
-        appendToCode(".class public test\n.super java/lang/Object\n"); //code for defining class
-        appendToCode(".method public <init>()V");
-        appendToCode("aload_0");
-        appendToCode("invokenonvirtual java/lang/Object/<init>()V");
-        appendToCode("return");
-        appendToCode(".end method\n");
-        appendToCode(".method public static main([Ljava/lang/String;)V");
-        appendToCode(".limit locals 100\n.limit stack 100");
-
-        /* generate temporal vars for syso */
-        declareVariable("1syso_int_var", INT_T);
-        declareVariable("1syso_float_var", FLOAT_T);
-
-        /*generate line*/
         appendToCode(".line 1");
     }
 

@@ -34,7 +34,7 @@
 %type<expressionType> expression
 %type<markerMType> marker_m
 %type<markerNType> marker_n
-%type<statementType> statement statement_list while
+%type<statementType> statement statement_list while if
 %type<booleanExpressionType> boolean_expression
 
 %code requires{
@@ -44,8 +44,8 @@
 %union{
     char id[30];
     char smallString[20];
-	  char id[30];
     int varType;
+
     struct ExpressionType{
       int varType;
       std::unordered_set<int> trueList;
@@ -126,10 +126,10 @@ if:
     	'{' statement_list '}'
     	marker_n
     	ELSE '{' marker_m statement_list '}' {
-	   backpatch($3.truelist, $5.nextInstructionIndex);
-	   backpatch($3.falselist, $12.nextInstructionIndex);
+	   backpatch($3.trueList, $5.nextInstructionIndex);
+	   backpatch($3.falseList, $12.nextInstructionIndex);
 	   std::unordered_set<int> temp = merge ( $7.nextList, $9.nextList);
-	   $$.nextlist = merge(temp, $13.nextlist );
+	   $$.nextList = merge(temp, $13.nextList );
     	}
     	;
 
