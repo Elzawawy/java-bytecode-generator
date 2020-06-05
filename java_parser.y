@@ -41,7 +41,7 @@
     }expressionType;
 
     struct MarkerType{
-	int next_instruction_index;
+	int nextInstructionIndex;
     }markerType;
 }
 
@@ -66,7 +66,7 @@ statement:
 marker:
 	%empty{
 	  // Save the index of the next instruction index in the marker
-	  $$.next_instruction_index = nextInstructionIndex;
+	  $$.nextInstructionIndex = nextInstructionIndex;
 	}
 	;
 
@@ -91,7 +91,12 @@ if:
 
 while: 
         WHILE marker '(' boolean_expression ')'
-        '{' marker statement_list '}'
+        '{' marker statement_list '}' {
+           backpatch($8.nextList, $2.nextInstructionIndex);
+           backpatch($4.trueList, $7.nextInstructionIndex);
+           $$.nextList = $4.falseList;
+           appendCode("goto" + $2.nextInstructionIndex);
+        }
         ;
 
 assignment: IDENTIFIER '=' expression ';'{
