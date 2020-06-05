@@ -10,6 +10,8 @@
 #include <utility>
 #include <vector>
 #include <unordered_set>
+#include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -109,7 +111,16 @@ namespace semantic_actions_util {
     string getOperationCode(string lexeme) {
         if(opList.count(lexeme) == 0) return "";
         return opList[lexeme];
-    }	
+    }
+
+    void writeBytecode(){
+        ofstream java_bytecode_file;
+        java_bytecode_file.open("java_bytecode.j");
+        for(auto instruction: aoutputCode){
+            java_bytecode_file<< instruction<< endl;
+        }
+        java_bytecode_file.close();
+    }
 
 }
 #endif //SEMANTIC_ACTIONS_UTILS_H
