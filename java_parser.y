@@ -102,7 +102,7 @@ marker_m:
 marker_n:
 	%empty{
 	  // Save the index of the next instruction index in the marker
-    $$.nextList = new unordered_set<int>();
+    	  $$.nextList = new unordered_set<int>();
 	  *($$.nextList) = makeList(nextInstructionIndex);
 	  appendToCode("goto");
 	}
