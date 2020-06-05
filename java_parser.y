@@ -34,7 +34,7 @@
 %type<expressionType> expression
 %type<markerMType> marker_m
 %type<markerNType> marker_n
-%type<statementType> statement statement_list while if
+%type<statementType> statement statement_list while if assignment declaration
 %type<booleanExpressionType> boolean_expression
 
 %code requires{
@@ -86,12 +86,12 @@ statement_list:
                 ;
 
 statement:  
-        declaration 
-        |if 
-        |while 
-        |assignment
+        declaration {$$.nextList = new vector<int>();}
+        |if {$$.nextList=$1.nextList;}
+        |while {$$nextList=$1.nextList;} 
+        |assignment {$$.nextList = new vector<int>();}
         ;
-
+        
 marker_m:
 	%empty{
 	  // Save the index of the next instruction index in the marker
