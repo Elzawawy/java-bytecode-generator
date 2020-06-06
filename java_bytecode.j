@@ -16,10 +16,9 @@ fconst0
 fstore_3
 .line 1
 ore_
-iload_3
- 15
-goto 
+goto 14
+goto _
 re_
-e 
+ble 
 return
 .end method

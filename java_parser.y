@@ -106,7 +106,7 @@ marker_n:
 	  // Save the index of the next instruction index in the marker
     	  $$.nextList = new unordered_set<int>();
 	  *($$.nextList) = makeList(nextInstructionIndex);
-	  appendToCode("goto");
+	  appendToCode("goto _");
 	}
 	;
 
@@ -144,7 +144,7 @@ while:
           backpatch(*($4.trueList), $7.nextInstructionIndex);
           $$.nextList = new unordered_set<int>();
           *($$.nextList) = *($4.falseList);
-          appendToCode("goto" + $2.nextInstructionIndex);
+          appendToCode("goto _" + $2.nextInstructionIndex);
         }
         ;
 
@@ -205,14 +205,14 @@ boolean_expression:
                     $$.trueList->insert(static_cast<int>(outputCode.size()));
                     $$.falseList = new unordered_set<int>();
                     // write code goto line #
-					          appendToCode("goto ");
+		    appendToCode("goto _");
                     }
                     |FALSE {
                     $$.trueList = new unordered_set<int> ();
                     $$.falseList= new unordered_set<int>();
                     $$.falseList->insert(static_cast<int>(outputCode.size()));
                     // write code goto line #
-					          appendToCode("goto ");
+		    appendToCode("goto _");
                     }
                     |boolean_expression BOOL_OP marker_m boolean_expression {
                     if(!strcmp($2, "&&")) {
@@ -232,7 +232,7 @@ boolean_expression:
                     $$.falseList = new unordered_set<int>();
                     ($$.falseList)->insert(static_cast<int>(outputCode.size()+1));
                     appendToCode(getOperationCode($2)+ " ");
-                    appendToCode("goto ");
+                    appendToCode("goto _");
                     }
                     ;
 %%
