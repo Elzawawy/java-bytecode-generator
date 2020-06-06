@@ -16,6 +16,9 @@ one-pass translation, the problem is solved by passing labels as inherited attri
 is generated, the target of the jump is temporarily left unspecified. Each such jump is put on a list of jumps whose labels are to be filled in when the proper
 label can be determined.
 
+## Method Body
+The generated code consists of a header,footer alongside with the statment list that contains the rest of the code,where the header appends the equivalent java byte-code for the class,the main method and sets the stack and locals size.
+The footer generetes a return from the method.
 
 ## Assumptions
 ### Java Used Grammar
