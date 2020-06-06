@@ -12,10 +12,10 @@ return
 .limit stack 100
 .line 1
 iconst_0
-istore_2
+istore_1
 iconst_0
-istore_3
+istore_2
 fconst_0
-fstore_4
+fstore_3
 return
 .end method
