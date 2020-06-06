@@ -168,7 +168,7 @@ expression:
             INT_NUM {$$.varType = VarType::INT_TYPE;  } 
             |FLOAT_NUM {$$.varType = VarType::FLOAT_TYPE ; }
             |IDENTIFIER {
-            // check if the identifier already exist to load or not
+              // check if the identifier already exist to load or not
             	if(checkIfVariableExists($1)) {
             		$$.varType = varToVarIndexAndType[$1].second;
             		if($$.varType == VarType::INT_TYPE ) {
@@ -212,14 +212,16 @@ boolean_expression:
                     // write code goto line #
 					          appendToCode("goto ");
                     }
-                    |expression BOOL_OP expression {
+                    |boolean_expression BOOL_OP marker_m boolean_expression {
                     if(!strcmp($2, "&&")) {
-                        *($$.trueList) = *($3.trueList);
-                        *($$.falseList) = mergeLists(*($1.falseList), *($3.falseList));
+                        backpatch(*($1.trueList), $3.nextInstructionIndex);
+                        *($$.trueList) = *($4.trueList);
+                        *($$.falseList) = mergeLists(*($1.falseList), *($4.falseList));
                       }
                     else if (!strcmp($2,"||")) {
-                        *($$.trueList) = mergeLists(*($1.trueList), *($3.trueList));
-                        *($$.falseList) = *($3.falseList);
+                        backpatch(*($1.falseList), $3.nextInstructionIndex);
+                        *($$.trueList) = mergeLists(*($1.trueList), *($4.trueList));
+                        *($$.falseList) = *($4.falseList);
                       }
                     }
                     |expression REL_OP expression {
