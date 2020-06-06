@@ -28,11 +28,11 @@ relop   "=="|"!="|"<="|">="|"<"|">"
 "true"  { return TRUE;}
 "false" { return FALSE;}
 {id}    { sscanf(yytext, "%s", yylval.id); return IDENTIFIER;}
-{inum}   { return INT_NUM;}
-{fnum} { return FLOAT_NUM;}
-{arithop}  { return ARITH_OP;}
-{boolop}   { return BOOL_OP;}
-{relop} { return REL_OP;}
+{inum}  { yylval.integer = atoi(yytext); return INT_NUM;}
+{fnum}  { yylval.floatType = atof(yytext); return FLOAT_NUM;}
+{arithop}  { sscanf(yytext, "%s", yylval.smallString); return ARITH_OP;}
+{boolop}   { sscanf(yytext, "%s", yylval.smallString); return BOOL_OP;}
+{relop} { sscanf(yytext, "%s", yylval.smallString); return REL_OP;}
 [\(\)\{\};=,] { return yytext[0];}
 \n  { ++line_num;}
 %%

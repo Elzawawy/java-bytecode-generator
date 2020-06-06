@@ -1,5 +1,4 @@
 # Generated Files by Flex 
-
 *.yy.c
 
 # Generated Files by Bison
@@ -8,6 +7,10 @@
 
 # Generated Executables
 *.out
+
+#Generated Java Files
+*.j
+*.class
 
 .idea
 .vscode
