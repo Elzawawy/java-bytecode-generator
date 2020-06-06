@@ -75,14 +75,16 @@
 %%
 method_body: 
             %empty
-            |{generateHeader();}statement_list{generateFooter();}
+            |{generateHeader();}statement_list{writeBytecode(); generateFooter();}
             ;
 
 statement_list: 
                 statement {*($$.nextList) = *($1.nextList);}
                 |statement_list marker_m statement
                 {
+                  cout<<"Backpacth statement List"<<endl;
                   backpatch(*($1.nextList) ,$2.nextInstructionIndex);
+                  cout<<"finish backpatch"<<endl;
                   *($$.nextList) = *($3.nextList);
                 }
                 ;
@@ -105,6 +107,7 @@ marker_m:
 
 marker_n:
 	%empty{
+    cout<<"In marker n ==================== "<< nextInstructionIndex<<" ======"<<endl;
 	  // Save the index of the next instruction index in the marker
     	  $$.nextList = new unordered_set<int>();
 	  *($$.nextList) = makeList(nextInstructionIndex);
@@ -131,9 +134,16 @@ if:
     	'{' statement_list '}'
     	marker_n
     	ELSE '{' marker_m statement_list '}' {
+      cout<<"backpatching in if else"<<endl;
       backpatch(*($3.trueList), $5.nextInstructionIndex);
+      cout<<"backpatching in if else"<<endl;
       backpatch(*($3.falseList), $12.nextInstructionIndex);
+      cout<<"Finish backpatch if else"<<endl;
       std::unordered_set<int> temp = mergeLists( *($7.nextList), *($9.nextList));
+
+      cout<<"printing nextlist 9 ====================="<<endl;
+      for(auto &&item:*($9.nextList)) cout<<outputCode[item]<<endl;
+
       $$.nextList = new unordered_set<int>();
       *($$.nextList) = mergeLists(temp, *($13.nextList));
     	}
@@ -142,8 +152,12 @@ if:
 while: 
         WHILE marker_m '(' boolean_expression ')'
         '{' marker_m statement_list '}' {
+          cout<<"backpatching in while"<<endl;
           backpatch(*($8.nextList), $2.nextInstructionIndex);
           backpatch(*($4.trueList), $7.nextInstructionIndex);
+          cout<<"finish backpatch"<<endl;
+          cout<<"next inst index ==== "<<nextInstructionIndex<<" "<<outputCode.size()<<endl;
+          for(auto &&item:outputCode) cout<<item<<endl;
           $$.nextList = new unordered_set<int>();
           *($$.nextList) = *($4.falseList);
           appendToCode("goto Label_" + to_string($2.nextInstructionIndex));
@@ -156,9 +170,9 @@ assignment: IDENTIFIER '=' expression ';'{
     //Check if the two sides have the same type
     if(varToVarIndexAndType[$1].second == $3.varType) {
       if(varToVarIndexAndType[$1].second == VarType::INT_TYPE) {
-        appendToCode("istore_"+to_string(varToVarIndexAndType[$1].first));
+        appendToCode("istore "+to_string(varToVarIndexAndType[$1].first));
       } else {//Only int and float are supported
-        appendToCode("fstore_"+to_string(varToVarIndexAndType[$1].first));
+        appendToCode("fstore "+to_string(varToVarIndexAndType[$1].first));
       }
     } else { // case when the two types aren't the same
       //TODO Cast the two variables
@@ -182,12 +196,12 @@ expression:
             		$$.varType = varToVarIndexAndType[$1].second;
             		if($$.varType == VarType::INT_TYPE ) {
             		  //write iload + identifier
-					        appendToCode("iload_" + to_string(varToVarIndexAndType[$1].first));
+					        appendToCode("iload " + to_string(varToVarIndexAndType[$1].first));
             		}
             		else {
             		  //float 
 						      //write fload + identifier
-					        appendToCode("fload_" + to_string(varToVarIndexAndType[$1].first));
+					        appendToCode("fload " + to_string(varToVarIndexAndType[$1].first));
             		}
             	}
             	else {//it's not declared at all
@@ -225,11 +239,13 @@ boolean_expression:
                     }
                     |boolean_expression BOOL_OP marker_m boolean_expression {
                     if(!strcmp($2, "&&")) {
+                      cout<<"backpatching bool"<<endl;
                         backpatch(*($1.trueList), $3.nextInstructionIndex);
                         *($$.trueList) = *($4.trueList);
                         *($$.falseList) = mergeLists(*($1.falseList), *($4.falseList));
                       }
                     else if (!strcmp($2,"||")) {
+                      cout<<"backpatching in bool"<<endl;
                         backpatch(*($1.falseList), $3.nextInstructionIndex);
                         *($$.trueList) = mergeLists(*($1.trueList), *($4.trueList));
                         *($$.falseList) = *($4.falseList);
@@ -271,7 +287,6 @@ int main(int argc, char** argv) {
   yyparse();
   std::cout<<"Yay ! Parser completed working successfully."<<std::endl;
 
-  writeBytecode();
 }
 
 void yyerror(const char *s) {

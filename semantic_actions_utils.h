@@ -60,6 +60,7 @@ namespace semantic_actions_util {
 
     void backpatch(unordered_set<int> list, int instruction_index) {
         for (auto index : list) {
+            cout<<"backpatch "<<outputCode[index]<<endl;
             outputCode[index] = outputCode[index].substr(0, outputCode[index].size()-1);
             outputCode[index] += "Label_" + to_string(instruction_index);
         }
@@ -69,10 +70,10 @@ namespace semantic_actions_util {
         declareVariable(name, varType);
         if (varType == INT_TYPE) {
             appendToCode("iconst_0");
-            appendToCode("istore_" + to_string(currentVariableIndex -1));
+            appendToCode("istore " + to_string(currentVariableIndex -1));
         } else if (varType == FLOAT_TYPE) {
             appendToCode("fconst_0");
-            appendToCode("fstore_" + to_string(currentVariableIndex -1));
+            appendToCode("fstore " + to_string(currentVariableIndex -1));
         }
 
     }
@@ -80,20 +81,26 @@ namespace semantic_actions_util {
     void generateHeader() {
         //TO-DO get file name
         //appendToCode(".source " + outfileName);
-        outputCode.push_back(".class public java_class\n.super java/lang/Object\n");
-        outputCode.push_back(".method public <init>()V");
-        outputCode.push_back("aload_0");
-        outputCode.push_back("invokenonvirtual java/lang/Object/<init>()V");
-        outputCode.push_back("return");
-        outputCode.push_back(".end method\n");
-        outputCode.push_back(".method public static main([Ljava/lang/String;)V");
-        outputCode.push_back(".limit locals 100\n.limit stack 100");
-        outputCode.push_back(".line 1");
+        ofstream java_bytecode_file;
+        java_bytecode_file.open("java_bytecode.j");
+        java_bytecode_file<<".class public java_class\n.super java/lang/Object\n"<<endl;
+        java_bytecode_file<<".method public <init>()V"<<endl;
+        java_bytecode_file<<"aload_0"<<endl;
+        java_bytecode_file<<"invokenonvirtual java/lang/Object/<init>()V"<<endl;
+        java_bytecode_file<<"return"<<endl;
+        java_bytecode_file<<".end method\n"<<endl;
+        java_bytecode_file<<".method public static main([Ljava/lang/String;)V"<<endl;
+        java_bytecode_file<<".limit locals 100\n.limit stack 100"<<endl;
+        java_bytecode_file<<".line 1"<<endl;
+        java_bytecode_file.close();
     }
 
     void generateFooter() {
-        outputCode.push_back("return");
-        outputCode.push_back(".end method");
+        ofstream java_bytecode_file;
+        java_bytecode_file.open("java_bytecode.j",std::ofstream::app);
+        java_bytecode_file<<"return"<<endl;
+        java_bytecode_file<<".end method"<<endl;
+        java_bytecode_file.close();
     }
 
     unordered_set<int> makeList(int instruction_index) {
@@ -114,7 +121,7 @@ namespace semantic_actions_util {
 
     void writeBytecode(){
         ofstream java_bytecode_file;
-        java_bytecode_file.open("java_bytecode.j");
+        java_bytecode_file.open("java_bytecode.j",std::ofstream::app);
         for(auto instruction: outputCode){
             // if(instruction.find("goto _") != string::npos) continue;
             java_bytecode_file<< instruction<< endl;
