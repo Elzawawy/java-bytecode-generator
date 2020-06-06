@@ -156,9 +156,9 @@ assignment: IDENTIFIER '=' expression ';'{
     //Check if the two sides have the same type
     if(varToVarIndexAndType[$1].second == $3.varType) {
       if(varToVarIndexAndType[$1].second == VarType::INT_TYPE) {
-        appendToCode("istore_"+varToVarIndexAndType[$1].first);
+        appendToCode("istore_"+to_string(varToVarIndexAndType[$1].first));
       } else {//Only int and float are supported
-        appendToCode("fstore_"+varToVarIndexAndType[$1].first);
+        appendToCode("fstore_"+to_string(varToVarIndexAndType[$1].first));
       }
     } else { // case when the two types aren't the same
       //TODO Cast the two variables
