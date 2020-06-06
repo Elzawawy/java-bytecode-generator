@@ -48,8 +48,6 @@
 
     struct ExpressionType{
       int varType;
-      std::unordered_set<int> *trueList;
-      std::unordered_set<int> *falseList;
     }expressionType;
 
     struct MarkerMType{
@@ -66,7 +64,7 @@
 
     struct BooleanExpressionType{
     	std::unordered_set<int> *trueList;
-        std::unordered_set<int> *falseList;
+      std::unordered_set<int> *falseList;
     }booleanExpressionType;
 }
 
@@ -77,18 +75,20 @@ method_body:
             ;
 
 statement_list: 
-                statement
+                statement {*($$.nextList) = *($1.nextList);}
                 |statement_list marker_m statement
                 {
                   backpatch(*($1.nextList) ,$2.nextInstructionIndex);
-                  $$.nextList = $3.nextList;
+                  *($$.nextList) = *($3.nextList);
                 }
                 ;
 
 statement:  
         declaration {$$.nextList = new unordered_set<int>();}
-        |if {$$.nextList=$1.nextList;}
-        |while {$$.nextList=$1.nextList;} 
+        |if {*($$.nextList)=*($1.nextList);}
+        |while {
+          *($$.nextList)=*($1.nextList);
+          } 
         |assignment {$$.nextList = new unordered_set<int>();}
         ;
 
@@ -130,6 +130,7 @@ if:
       backpatch(*($3.trueList), $5.nextInstructionIndex);
       backpatch(*($3.falseList), $12.nextInstructionIndex);
       std::unordered_set<int> temp = mergeLists( *($7.nextList), *($9.nextList));
+      $$.nextList = new unordered_set<int>();
       *($$.nextList) = mergeLists(temp, *($13.nextList));
     	}
     	;
@@ -137,10 +138,11 @@ if:
 while: 
         WHILE marker_m '(' boolean_expression ')'
         '{' marker_m statement_list '}' {
-           backpatch(*($8.nextList), $2.nextInstructionIndex);
-           backpatch(*($4.trueList), $7.nextInstructionIndex);
-           *($$.nextList) = *($4.falseList);
-           appendToCode("goto" + $2.nextInstructionIndex);
+          backpatch(*($8.nextList), $2.nextInstructionIndex);
+          backpatch(*($4.trueList), $7.nextInstructionIndex);
+          $$.nextList = new unordered_set<int>();
+          *($$.nextList) = *($4.falseList);
+          appendToCode("goto" + $2.nextInstructionIndex);
         }
         ;
 
