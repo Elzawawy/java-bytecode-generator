@@ -2,6 +2,8 @@
   #include <cstdio>
   #include <iostream>
   #include <string.h>
+  #include <fstream>
+
   #include "semantic_actions_utils.h"
 
   using namespace semantic_actions_util;
@@ -102,7 +104,7 @@ marker_m:
 marker_n:
 	%empty{
 	  // Save the index of the next instruction index in the marker
-    $$.nextList = new unordered_set<int>();
+    	  $$.nextList = new unordered_set<int>();
 	  *($$.nextList) = makeList(nextInstructionIndex);
 	  appendToCode("goto");
 	}
@@ -259,8 +261,9 @@ int main(int argc, char** argv) {
   // Parse through the input:
   yyparse();
   std::cout<<"Yay ! Parser completed working successfully."<<std::endl;
-}
 
+  writeBytecode();
+}
 
 void yyerror(const char *s) {
   std::cout << "Ouch, I found a parse error on line "<< line_num <<" ! Error Message: " << s << std::endl;
