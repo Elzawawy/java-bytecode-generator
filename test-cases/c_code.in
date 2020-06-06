@@ -11,7 +11,7 @@ else
 
 int y;
 y = 3;
-if(x && y)
+if(x==4 && y==7)
 {
     x=7;
 }

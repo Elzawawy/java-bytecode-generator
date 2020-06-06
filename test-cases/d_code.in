@@ -1,3 +1,6 @@
-while(y  && 7){
+int y;
+int z;
+y = 7;
+while(y==4){
     z=4;
 }

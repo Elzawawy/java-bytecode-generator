@@ -27,7 +27,7 @@ relop   "=="|"!="|"<="|">="|"<"|">"
 "float"	{ return FLOAT;}
 "true"  { return TRUE;}
 "false" { return FALSE;}
-{id}    { return IDENTIFIER;}
+{id}    { sscanf(yytext, "%s", yylval.id); return IDENTIFIER;}
 {inum}   { return INT_NUM;}
 {fnum} { return FLOAT_NUM;}
 {arithop}  { return ARITH_OP;}
