@@ -15,11 +15,5 @@ istore_2
 fconst0
 fstore_3
 .line 1
-ore_
-iload_3
- 15
-goto 
-re_
-e 
 return
 .end method
