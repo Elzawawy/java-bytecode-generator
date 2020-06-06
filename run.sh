@@ -7,6 +7,7 @@ make build_all
 if [ "$1" = "--debug" -o "$1" = "-d" ]; then
     if [ -r "test-cases/$2" ]; then
         ./java_compiler.out "test-cases/$2"
+	make jasmin_run
     else
         echo "The argument '$2' is not a valid file, or does not exist in test-cases directory. Are you sure you want debug mode ?"
     fi
@@ -14,6 +15,7 @@ if [ "$1" = "--debug" -o "$1" = "-d" ]; then
 else 
     if [ -r "$1" ]; then
         ./java_compiler.out "$1"
+	make jasmin_run
     else
         echo "The argument '$1' is not a valid file, or does not exist."
     fi

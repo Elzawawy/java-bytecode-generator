@@ -70,7 +70,7 @@ namespace semantic_actions_util {
         if (varType == INT_TYPE) {
             appendToCode("iconst_0\nistore_" + to_string(currentVariableIndex));
         } else if (varType == FLOAT_TYPE) {
-            appendToCode("fconst0\nfstore_" + to_string(currentVariableIndex));
+            appendToCode("fconst_0\nfstore_" + to_string(currentVariableIndex));
         }
 
     }
@@ -87,8 +87,7 @@ namespace semantic_actions_util {
         appendToCode(".method public static main([Ljava/lang/String;)V");
         appendToCode(".limit locals 100\n.limit stack 100");
 
-        defineVariable("1syso_int_var", INT_TYPE);
-        defineVariable("1syso_float_var", FLOAT_TYPE);
+    
 
         appendToCode(".line 1");
     }
