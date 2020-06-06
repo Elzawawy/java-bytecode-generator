@@ -4,6 +4,76 @@ Built using Flex & Bison to take in any java source code and emits its equivalen
 
 <p align='center'><img src='./images/cover.png'/></p>
 
+## Translation of Productions
+Each production is associated with a **semantic actions**. This semantic actions will be generated when the production is matched by the parser.
+
+
+## Backpatching
+When generating code for boolean expressions and flow-of-control statements is that of matching a jump instruction with the target of the jump. For example, the translation of the boolean expression B in **if ( B ) S**, the target of the jump when **B** is false will not be declared until **S** is examined. In a
+one-pass translation, the problem is solved by passing labels as inherited attributes to where the relevant jump instructions were generated. But a separate pass is then needed to bind labels to addresses.
+
+***Backpatching*** counters the problem of two-passes translation by having lists of jumps are passed as synthesized attributes. Specifically, when a jump
+is generated, the target of the jump is temporarily left unspecified. Each such jump is put on a list of jumps whose labels are to be filled in when the proper
+label can be determined.
+
+
+## Assumptions
+### Java Used Grammar
+The input programs we are dealing with follow the below rules. These aren't a full java grammar but a subset of it.
+
+```
+method_body: 
+            %empty
+            |statement_list
+            ;
+
+statement_list: 
+                statement
+                |statement_list statement
+                ;
+
+statement:  
+        declaration 
+        |if 
+        |while 
+        |assignment
+        ;
+
+declaration: primitive_type IDENTIFIER ';';
+
+primitive_type: 
+                INT 
+                |FLOAT
+                ;
+
+if: 
+    IF '(' boolean_expression ')'
+    '{' statement_list '}' 
+    ELSE '{' statement_list '}'
+    ;
+
+while: 
+        WHILE '(' boolean_expression ')'
+        '{' statement_list '}'
+        ;
+
+assignment: IDENTIFIER '=' expression ';';
+
+expression:
+            INT_NUM
+            |FLOAT_NUM
+            |IDENTIFIER
+            |expression ARITH_OP expression
+            |'(' expression ')'
+            ;
+
+boolean_expression: 
+                    TRUE 
+                    |FALSE
+                    |expression BOOL_OP expression
+                    |expression REL_OP expression
+```
+
 ## Running & Testing
 
 To run the program, use the script `run.sh` as follows:

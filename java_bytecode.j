@@ -1,4 +1,4 @@
-.class public test
+.class public java_class
 .super java/lang/Object
 
 .method public <init>()V
@@ -15,7 +15,24 @@ iconst_0
 istore_1
 iconst_0
 istore_2
+tore_
+iconst_0
+istore_3
+ore_
+iconst_0
+istore_4
+re_
+iconst_0
+istore_5
+e_
+iconst_0
+istore_6
+_
+iconst_0
+istore_7
+
 fconst_0
-fstore_3
+fstore_8
+ not declared
 return
 .end method
