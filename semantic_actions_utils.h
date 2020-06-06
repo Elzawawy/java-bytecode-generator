@@ -116,7 +116,7 @@ namespace semantic_actions_util {
     void writeBytecode(){
         ofstream java_bytecode_file;
         java_bytecode_file.open("java_bytecode.j");
-        for(auto instruction: aoutputCode){
+        for(auto instruction: outputCode){
             java_bytecode_file<< instruction<< endl;
         }
         java_bytecode_file.close();
