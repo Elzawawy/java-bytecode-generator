@@ -146,11 +146,7 @@ while:
           backpatch(*($4.trueList), $7.nextInstructionIndex);
           $$.nextList = new unordered_set<int>();
           *($$.nextList) = *($4.falseList);
-<<<<<<< HEAD
-          appendToCode("goto " + to_string($2.nextInstructionIndex));
-=======
-          appendToCode("goto Label_" + to_string($2.nextInstructionIndex));
->>>>>>> fec483a1a35de6398462b673852227877513f7b8
+          appendToCode("goto Label" + to_string($2.nextInstructionIndex));
         }
         ;
 
