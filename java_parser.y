@@ -19,8 +19,8 @@
 %error-verbose
 
 %token<id> IDENTIFIER
-%token INT_NUM
-%token FLOAT_NUM
+%token<integer> INT_NUM
+%token<floatType> FLOAT_NUM
 %token<smallString> ARITH_OP
 %token <smallString>BOOL_OP
 %token <smallString>REL_OP
@@ -47,6 +47,8 @@
     char id[30];
     char smallString[20];
     int varType;
+    int integer;
+    float floatType;
 
     struct ExpressionType{
       int varType;
@@ -154,9 +156,9 @@ assignment: IDENTIFIER '=' expression ';'{
     //Check if the two sides have the same type
     if(varToVarIndexAndType[$1].second == $3.varType) {
       if(varToVarIndexAndType[$1].second == VarType::INT_TYPE) {
-        appendToCode("istore_"+varToVarIndexAndType[$1].first);
+        appendToCode("istore_"+to_string(varToVarIndexAndType[$1].first));
       } else {//Only int and float are supported
-        appendToCode("fstore_"+varToVarIndexAndType[$1].first);
+        appendToCode("fstore_"+to_string(varToVarIndexAndType[$1].first));
       }
     } else { // case when the two types aren't the same
       //TODO Cast the two variables
@@ -167,8 +169,13 @@ assignment: IDENTIFIER '=' expression ';'{
 };
 
 expression:
-            INT_NUM {$$.varType = VarType::INT_TYPE;  } 
-            |FLOAT_NUM {$$.varType = VarType::FLOAT_TYPE ; }
+            INT_NUM {
+                  $$.varType = VarType::INT_TYPE;
+                  appendToCode("ldc "+ to_string($1));
+                    } 
+            |FLOAT_NUM {
+                  $$.varType = VarType::FLOAT_TYPE ;
+                  appendToCode("ldc "+ to_string($1)); }
             |IDENTIFIER {
               // check if the identifier already exist to load or not
             	if(checkIfVariableExists($1)) {
