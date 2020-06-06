@@ -54,23 +54,25 @@ namespace semantic_actions_util {
     }
 
     void appendToCode(string code) {
-        outputCode.push_back(code);
+        outputCode.push_back("Label_" + std::to_string(nextInstructionIndex) + ":\n" + code);
         nextInstructionIndex++;
     }
 
     void backpatch(unordered_set<int> list, int instruction_index) {
         for (auto index : list) {
             outputCode[index] = outputCode[index].substr(0, outputCode[index].size()-1);
-            outputCode[index] += to_string(instruction_index);
+            outputCode[index] += "Label_" + to_string(instruction_index);
         }
     }
 
     void defineVariable(string name, int varType) {
         declareVariable(name, varType);
         if (varType == INT_TYPE) {
-            appendToCode("iconst_0\nistore_" + to_string(currentVariableIndex -1));
+            appendToCode("iconst_0");
+            appendToCode("istore_" + to_string(currentVariableIndex -1));
         } else if (varType == FLOAT_TYPE) {
-            appendToCode("fconst_0\nfstore_" + to_string(currentVariableIndex -1));
+            appendToCode("fconst_0");
+            appendToCode("fstore_" + to_string(currentVariableIndex -1));
         }
 
     }
@@ -78,20 +80,20 @@ namespace semantic_actions_util {
     void generateHeader() {
         //TO-DO get file name
         //appendToCode(".source " + outfileName);
-        appendToCode(".class public java_class\n.super java/lang/Object\n");
-        appendToCode(".method public <init>()V");
-        appendToCode("aload_0");
-        appendToCode("invokenonvirtual java/lang/Object/<init>()V");
-        appendToCode("return");
-        appendToCode(".end method\n");
-        appendToCode(".method public static main([Ljava/lang/String;)V");
-        appendToCode(".limit locals 100\n.limit stack 100");
-        appendToCode(".line 1");
+        outputCode.push_back(".class public java_class\n.super java/lang/Object\n");
+        outputCode.push_back(".method public <init>()V");
+        outputCode.push_back("aload_0");
+        outputCode.push_back("invokenonvirtual java/lang/Object/<init>()V");
+        outputCode.push_back("return");
+        outputCode.push_back(".end method\n");
+        outputCode.push_back(".method public static main([Ljava/lang/String;)V");
+        outputCode.push_back(".limit locals 100\n.limit stack 100");
+        outputCode.push_back(".line 1");
     }
 
     void generateFooter() {
-        appendToCode("return");
-        appendToCode(".end method");
+        outputCode.push_back("return");
+        outputCode.push_back(".end method");
     }
 
     unordered_set<int> makeList(int instruction_index) {
