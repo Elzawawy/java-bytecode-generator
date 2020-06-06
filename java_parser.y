@@ -146,7 +146,7 @@ while:
           backpatch(*($4.trueList), $7.nextInstructionIndex);
           $$.nextList = new unordered_set<int>();
           *($$.nextList) = *($4.falseList);
-          appendToCode("goto _" + $2.nextInstructionIndex);
+          appendToCode("goto " + to_string($2.nextInstructionIndex));
         }
         ;
 
@@ -197,7 +197,6 @@ expression:
             }
             |expression ARITH_OP expression { 
                   if ($1.varType == $3.varType ) {
-                    cout<<"Arith "<<$2<<endl;
                     if ($1.varType == VarType::INT_TYPE) {
                       appendToCode("i" + getOperationCode($2));
                     }
@@ -241,7 +240,7 @@ boolean_expression:
                     ($$.trueList)->insert(static_cast<int>(outputCode.size()));
                     $$.falseList = new unordered_set<int>();
                     ($$.falseList)->insert(static_cast<int>(outputCode.size()+1));
-                    appendToCode(getOperationCode($2)+ " ");
+                    appendToCode(getOperationCode($2)+ " _");
                     appendToCode("goto _");
                     }
                     ;
