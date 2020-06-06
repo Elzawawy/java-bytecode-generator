@@ -196,11 +196,14 @@ expression:
             	}
             }
             |expression ARITH_OP expression { 
-                if ($1.varType == $3.varType ) {
-                  if ($1.varType == VarType::INT_TYPE)  
-                    appendToCode("i" + getOperationCode($2));
-                  else //it's float          
+                  if ($1.varType == $3.varType ) {
+                    cout<<"Arith "<<$2<<endl;
+                    if ($1.varType == VarType::INT_TYPE) {
+                      appendToCode("i" + getOperationCode($2));
+                    }
+                  else{ //it's float          
                     appendToCode("f" + getOperationCode($2));
+                  }
                 }
 			        }
             |'(' expression ')' {$$.varType = $2.varType;}
