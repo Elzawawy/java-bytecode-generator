@@ -10,10 +10,12 @@ return
 .method public static main([Ljava/lang/String;)V
 .limit locals 100
 .limit stack 100
+.line 1
 iconst_0
 istore_2
-fconst0
-fstore_3
-.line 1
+iconst_0
+istore_3
+fconst_0
+fstore_4
 return
 .end method

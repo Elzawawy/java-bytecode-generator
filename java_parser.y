@@ -114,7 +114,7 @@ declaration: primitive_type IDENTIFIER ';' {
   if(checkIfVariableExists($2)) {
     yyerror(string{"variable "+string{$2}+" is already declared"}.data());
   } else {
-    declareVariable($2, $1);
+    defineVariable($2, $1);
   }
 };
 
