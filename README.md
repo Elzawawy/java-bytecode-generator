@@ -20,6 +20,11 @@ label can be determined.
 The generated code consists of a header,footer alongside with the statment list that contains the rest of the code,where the header appends the equivalent java byte-code for the class,the main method and sets the stack and locals size.
 The footer generetes a return from the method.
 
+## IF
+-Sends the true list of the boolean expression and the first marker instruction index to the backpatching function.
+-Sends the false list of the boolean expression and the second marker instrcution index to the backpatching function.
+-Perform the merging of lists logic
+
 ## Assumptions
 ### Java Used Grammar
 The input programs we are dealing with follow the below rules. These aren't a full java grammar but a subset of it.
