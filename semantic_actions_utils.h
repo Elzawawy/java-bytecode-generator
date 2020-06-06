@@ -116,6 +116,7 @@ namespace semantic_actions_util {
         ofstream java_bytecode_file;
         java_bytecode_file.open("java_bytecode.j");
         for(auto instruction: outputCode){
+            // if(instruction.find("goto _") != string::npos) continue;
             java_bytecode_file<< instruction<< endl;
         }
         java_bytecode_file.close();
