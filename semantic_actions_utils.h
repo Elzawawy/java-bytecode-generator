@@ -77,7 +77,7 @@ namespace semantic_actions_util {
     void generateHeader() {
         //TO-DO get file name
         //appendToCode(".source " + outfileName);
-        appendToCode(".class public test\n.super java/lang/Object\n");
+        appendToCode(".class public java_class\n.super java/lang/Object\n");
         appendToCode(".method public <init>()V");
         appendToCode("aload_0");
         appendToCode("invokenonvirtual java/lang/Object/<init>()V");
@@ -85,9 +85,6 @@ namespace semantic_actions_util {
         appendToCode(".end method\n");
         appendToCode(".method public static main([Ljava/lang/String;)V");
         appendToCode(".limit locals 100\n.limit stack 100");
-
-    
-
         appendToCode(".line 1");
     }
 
