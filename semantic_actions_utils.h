@@ -67,9 +67,9 @@ namespace semantic_actions_util {
     void defineVariable(string name, int varType) {
         declareVariable(name, varType);
         if (varType == INT_TYPE) {
-            appendToCode("iconst_0\nistore_" + to_string(currentVariableIndex));
+            appendToCode("iconst_0\nistore_" + to_string(currentVariableIndex -1));
         } else if (varType == FLOAT_TYPE) {
-            appendToCode("fconst_0\nfstore_" + to_string(currentVariableIndex));
+            appendToCode("fconst_0\nfstore_" + to_string(currentVariableIndex -1));
         }
 
     }
