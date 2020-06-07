@@ -60,7 +60,6 @@ namespace semantic_actions_util {
 
     void backpatch(unordered_set<int> list, int instruction_index) {
         for (auto index : list) {
-            cout<<"backpatch "<<outputCode[index]<<endl;
             outputCode[index] = outputCode[index].substr(0, outputCode[index].size()-1);
             outputCode[index] += "Label_" + to_string(instruction_index);
         }

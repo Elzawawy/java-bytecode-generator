@@ -85,10 +85,7 @@ statement_list:
                 statement {*($$.nextList) = *($1.nextList);}
                 |statement_list marker_m statement
                 {
-                  cout<<"Backpacth statement List"<<endl;
-                  cout<<  $2.nextInstructionIndex << endl;
                   backpatch(*($1.nextList) ,$2.nextInstructionIndex);
-                  cout<<"finish backpatch"<<endl;
                   *($$.nextList) = *($3.nextList);
                 }
                 ;
@@ -111,9 +108,8 @@ marker_m:
 
 marker_n:
 	%empty{
-    cout<<"In marker n ==================== "<< nextInstructionIndex<<" ======"<<endl;
 	  // Save the index of the next instruction index in the marker
-    	  $$.nextList = new unordered_set<int>();
+    $$.nextList = new unordered_set<int>();
 	  *($$.nextList) = makeList(nextInstructionIndex);
 	  appendToCode("goto _");
 	}
@@ -138,16 +134,9 @@ if:
     	'{' statement_list '}'
     	marker_n
     	ELSE '{' marker_m statement_list '}' {
-      cout<<"backpatching in if else"<<endl;
       backpatch(*($3.trueList), $5.nextInstructionIndex);
-      cout<<"backpatching in if else"<<endl;
       backpatch(*($3.falseList), $12.nextInstructionIndex);
-      cout<<"Finish backpatch if else"<<endl;
       std::unordered_set<int> temp = mergeLists( *($7.nextList), *($9.nextList));
-
-      cout<<"printing nextlist 9 ====================="<<endl;
-      for(auto &&item:*($9.nextList)) cout<<outputCode[item]<<endl;
-
       $$.nextList = new unordered_set<int>();
       *($$.nextList) = mergeLists(temp, *($13.nextList));
     	}
@@ -156,12 +145,8 @@ if:
 while: 
         WHILE marker_m '(' boolean_expression ')'
         '{' marker_m statement_list '}' {
-          cout<<"backpatching in while"<<endl;
           backpatch(*($8.nextList), $2.nextInstructionIndex);
           backpatch(*($4.trueList), $7.nextInstructionIndex);
-          cout<<"finish backpatch"<<endl;
-          cout<<"next inst index ==== "<<nextInstructionIndex<<" "<<outputCode.size()<<endl;
-          for(auto &&item:outputCode) cout<<item<<endl;
           $$.nextList = new unordered_set<int>();
           *($$.nextList) = *($4.falseList);
           appendToCode("goto Label_" + to_string($2.nextInstructionIndex));
@@ -169,7 +154,6 @@ while:
         ;
 
 assignment: IDENTIFIER '=' expression ';'{
-  cout<<"asg: "<<$1<<" "<<" "<<$3.varType<<endl;
   if(checkIfVariableExists($1)) {
     //Check if the two sides have the same type
     if(varToVarIndexAndType[$1].second == $3.varType) {
@@ -232,24 +216,22 @@ boolean_expression:
                     $$.trueList->insert(static_cast<int>(outputCode.size()));
                     $$.falseList = new unordered_set<int>();
                     // write code goto line #
-		    appendToCode("goto _");
+		                appendToCode("goto _");
                     }
                     |FALSE {
                     $$.trueList = new unordered_set<int> ();
                     $$.falseList= new unordered_set<int>();
                     $$.falseList->insert(static_cast<int>(outputCode.size()));
                     // write code goto line #
-		    appendToCode("goto _");
+		                appendToCode("goto _");
                     }
                     |boolean_expression BOOL_OP marker_m boolean_expression {
                     if(!strcmp($2, "&&")) {
-                      cout<<"backpatching bool"<<endl;
                         backpatch(*($1.trueList), $3.nextInstructionIndex);
                         *($$.trueList) = *($4.trueList);
                         *($$.falseList) = mergeLists(*($1.falseList), *($4.falseList));
                       }
                     else if (!strcmp($2,"||")) {
-                      cout<<"backpatching in bool"<<endl;
                         backpatch(*($1.falseList), $3.nextInstructionIndex);
                         *($$.trueList) = mergeLists(*($1.trueList), *($4.trueList));
                         *($$.falseList) = *($4.falseList);
