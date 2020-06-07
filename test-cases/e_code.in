@@ -1,7 +1,7 @@
 int x;
 int y;
 y = 5;
-int z ;
+int z;
 z = 130;
 int z1;
 z1 = 65536;
@@ -25,6 +25,6 @@ else
     x=5;
 }
 
-while(y  && 7){
+while(false){
     z=4;
 }

@@ -75,7 +75,10 @@
 %%
 method_body: 
             %empty
-            |{generateHeader();}statement_list{writeBytecode(); generateFooter();}
+            |{generateHeader();}statement_list marker_m{
+            backpatch(*($2.nextList), $3.nextInstructionIndex);
+            writeBytecode();
+            generateFooter();}
             ;
 
 statement_list: 
@@ -83,6 +86,7 @@ statement_list:
                 |statement_list marker_m statement
                 {
                   cout<<"Backpacth statement List"<<endl;
+                  cout<<  $2.nextInstructionIndex << endl;
                   backpatch(*($1.nextList) ,$2.nextInstructionIndex);
                   cout<<"finish backpatch"<<endl;
                   *($$.nextList) = *($3.nextList);

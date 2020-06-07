@@ -98,6 +98,7 @@ namespace semantic_actions_util {
     void generateFooter() {
         ofstream java_bytecode_file;
         java_bytecode_file.open("java_bytecode.j",std::ofstream::app);
+        java_bytecode_file<<"Label_" + to_string(nextInstructionIndex)+ ":"<<endl;
         java_bytecode_file<<"return"<<endl;
         java_bytecode_file<<".end method"<<endl;
         java_bytecode_file.close();

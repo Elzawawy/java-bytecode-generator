@@ -1,6 +1,6 @@
 int y;
 int z;
 y = 7;
-while(true && true){
+while(false){
     z=4;
 }
