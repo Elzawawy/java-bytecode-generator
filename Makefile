@@ -15,3 +15,6 @@ build_all:
 jasmin_run: 
 	@java -jar jasmin.jar java_bytecode.j
 	@java java_class
+
+clean:
+	rm -f *.o *~ lex.c lexical_analyzer.yy.c parser.tab.c parser.tab.h java_bytecode.j java_class.class java_compiler.out
